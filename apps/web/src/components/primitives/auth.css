@@ -1,0 +1,333 @@
+/* ================================================================
+   MarchéLink — Auth Pages
+   S04 — Impeccable : pas de glassmorphism, fond solide texturé,
+   tokens sémantiques, touch targets 44px, focus ring unifié.
+   ================================================================ */
+
+/* ── Page shell ──────────────────────────────────────────────── */
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  /* Fond beige avec grille de points subtile — pas de blur/glassmorphism */
+  background-color: var(--color-bg-secondary);
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-10);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  letter-spacing: var(--tracking-tight);
+  text-decoration: none;
+  margin-bottom: var(--space-5);
+}
+
+.auth-brand-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.auth-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-2);
+}
+
+.auth-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: var(--line-normal);
+}
+
+/* ── Form ────────────────────────────────────────────────────── */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Field ───────────────────────────────────────────────────── */
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.auth-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+
+.auth-input {
+  width: 100%;
+  min-height: 44px;                     /* touch target */
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--color-text);
+  background: var(--color-bg-secondary);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  outline: none;
+  transition: border-color var(--transition-fast),
+              background var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.auth-input::placeholder {
+  color: var(--color-faint);
+}
+
+.auth-input:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+
+.auth-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-bg);
+  box-shadow: var(--focus-ring);
+}
+
+.auth-input--error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.auth-input--error:focus {
+  box-shadow: var(--focus-ring-danger);
+}
+
+.auth-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Field-level error ───────────────────────────────────────── */
+
+.auth-field-error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  min-height: 16px;
+  line-height: var(--line-snug);
+}
+
+/* Suffixe "(optionnel)" dans un label */
+.auth-label-opt {
+  font-weight: var(--weight-normal);
+  color: var(--color-muted);
+}
+
+/* ── Row (prénom / nom) ──────────────────────────────────────── */
+
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+/* ── Actions (zone bouton avec espace supplémentaire) ────────── */
+
+.auth-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ── Submit Button ───────────────────────────────────────────── */
+
+.auth-submit {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-fg);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--duration-fast) var(--ease-out-quart);
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.auth-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Spinner (dans le bouton) ────────────────────────────────── */
+
+.auth-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.30);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: auth-spin 0.55s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes auth-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── API Error Banner ────────────────────────────────────────── */
+
+.auth-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  line-height: var(--line-snug);
+  margin-bottom: var(--space-4);
+}
+
+.auth-error-banner svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.auth-footer a {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-footer a:hover {
+  color: var(--color-accent);
+}
+
+/* ── Divider (ex: "ou continuer avec") ──────────────────────── */
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-faint);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* ── Route Guard ─────────────────────────────────────────────── */
+
+.auth-guard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--color-bg-secondary);
+}
+
+.auth-guard-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2.5px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: auth-spin 0.65s linear infinite;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: var(--space-4);
+    /* Grille moins dense sur mobile */
+    background-size: 18px 18px;
+    align-items: flex-start;
+    padding-top: var(--space-10);
+  }
+
+  .auth-card {
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+
+  .auth-title {
+    font-size: var(--text-xl);
+  }
+
+  .auth-row {
+    grid-template-columns: 1fr;
+  }
+}

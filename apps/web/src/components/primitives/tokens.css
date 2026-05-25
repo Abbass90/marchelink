@@ -1,0 +1,248 @@
+/* ================================================================
+   MarchéLink — Design Tokens
+   Règles : Impeccable (typographie ≥1.25 scale, easing expo,
+   spacing rythmique, neutrals teintés, anti-patterns bannis)
+   ================================================================ */
+
+:root {
+
+  /* ── Palette brand (couleurs source — ne jamais modifier) ──── */
+  --brand-espresso:  #3E2723;   /* brun très foncé                */
+  --brand-cacao:     #4A3728;   /* brun foncé principal           */
+  --brand-noisette:  #8B7355;   /* brun moyen / muted             */
+  --brand-caramel:   #8B5A2B;   /* accent chaud                   */
+  --brand-ivoire:    #F7F4EF;   /* fond secondaire beige          */
+  --brand-perle:     #EFEBE9;   /* bordure beige                  */
+  --brand-blanc:     #ffffff;   /* fond principal                 */
+
+
+  /* ── Couleurs sémantiques ─────────────────────────────────── */
+
+  /* Surfaces */
+  --color-bg:            var(--brand-blanc);
+  --color-bg-secondary:  var(--brand-ivoire);
+  --color-bg-subtle:     #F0EBE3;   /* entre ivoire et perle      */
+
+  /* Texte */
+  --color-text:          var(--brand-espresso);
+  --color-muted:         var(--brand-noisette);
+  --color-faint:         #B5A898;   /* labels désactivés          */
+
+  /* Primaire */
+  --color-primary:       var(--brand-cacao);
+  --color-primary-hover: var(--brand-espresso);
+  --color-primary-fg:    var(--brand-blanc);
+
+  /* Accent */
+  --color-accent:        var(--brand-caramel);
+  --color-accent-fg:     var(--brand-blanc);
+
+  /* Bordures */
+  --color-border:        var(--brand-perle);
+  --color-border-strong: #D4CDC5;
+
+  /* États sémantiques */
+  --color-success:       #2E7D32;
+  --color-success-bg:    #F0FBF0;
+  --color-success-border:#A5D6A7;
+
+  --color-danger:        #C62828;
+  --color-danger-bg:     #FEF2F2;
+  --color-danger-border: #FFCDD2;
+
+  --color-warning:       #B45309;
+  --color-warning-bg:    #FFFBEB;
+  --color-warning-border:#FDE68A;
+
+  --color-info:          #1565C0;
+  --color-info-bg:       #EFF6FF;
+  --color-info-border:   #BFDBFE;
+
+
+  /* ── Typographie ──────────────────────────────────────────── */
+  --font-sans:    'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /*
+   * Échelle modulaire 1.250 (Major Third — Impeccable §typo)
+   * ≥1.25 ratio requis pour une hiérarchie lisible
+   */
+  --text-xs:    0.64rem;    /*  ~10px  */
+  --text-sm:    0.80rem;    /*  ~13px  */
+  --text-md:    1.00rem;    /*   16px  ← base, alias de text-base */
+  --text-base:  1.00rem;
+  --text-lg:    1.25rem;    /*   20px  */
+  --text-xl:    1.563rem;   /*   25px  */
+  --text-2xl:   1.953rem;   /*  ~31px  */
+  --text-3xl:   2.441rem;   /*  ~39px  */
+  --text-4xl:   3.052rem;   /*  ~49px  */
+  --text-5xl:   3.815rem;   /*  ~61px  */
+  --text-6xl:   4.768rem;   /*  ~76px  */
+
+  /* Graisses */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    800;
+
+  /* Interlignage */
+  --line-tight:   1.10;
+  --line-snug:    1.30;
+  --line-normal:  1.60;
+  --line-relaxed: 1.75;
+
+  /* Espacement des lettres */
+  --tracking-tight:   -0.025em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.03em;
+  --tracking-widest:   0.10em;
+
+
+  /* ── Espacement (grille 4px, rythme varié) ────────────────── */
+  /*
+   * Impeccable §layout : "Vary spacing for rhythm;
+   * uniform padding creates monotony."
+   * On utilise la grille 4px mais avec des sauts non-linéaires
+   * pour créer du rythme visuel entre les sections.
+   */
+  --space-px:  1px;
+  --space-0:   0;
+  --space-1:   0.25rem;   /*  4px  */
+  --space-2:   0.50rem;   /*  8px  */
+  --space-3:   0.75rem;   /* 12px  */
+  --space-4:   1.00rem;   /* 16px  */
+  --space-5:   1.25rem;   /* 20px  */
+  --space-6:   1.50rem;   /* 24px  */
+  --space-7:   1.75rem;   /* 28px  */
+  --space-8:   2.00rem;   /* 32px  */
+  --space-10:  2.50rem;   /* 40px  */
+  --space-12:  3.00rem;   /* 48px  */
+  --space-14:  3.50rem;   /* 56px  */
+  --space-16:  4.00rem;   /* 64px  */
+  --space-20:  5.00rem;   /* 80px  */
+  --space-24:  6.00rem;   /* 96px  */
+  --space-32:  8.00rem;   /* 128px */
+
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  20px;
+  --radius-3xl:  24px;
+  --radius-full: 9999px;
+
+
+  /* ── Ombres (teintées brand — jamais gris pur) ────────────── */
+  --shadow-xs:    0 1px 2px  rgba(62, 39, 35, 0.04);
+  --shadow-sm:    0 1px 3px  rgba(62, 39, 35, 0.06),
+                  0 1px 2px  rgba(62, 39, 35, 0.04);
+  --shadow-md:    0 4px 8px  rgba(62, 39, 35, 0.07),
+                  0 2px 4px  rgba(62, 39, 35, 0.04);
+  --shadow-lg:    0 8px 20px rgba(62, 39, 35, 0.08),
+                  0 4px 8px  rgba(62, 39, 35, 0.04);
+  --shadow-xl:    0 16px 40px rgba(62, 39, 35, 0.10),
+                  0 6px 12px rgba(62, 39, 35, 0.06);
+  --shadow-2xl:   0 24px 60px rgba(62, 39, 35, 0.14);
+  --shadow-inner: inset 0 2px 4px rgba(62, 39, 35, 0.06);
+
+  /* Alias de compatibilité */
+  --shadow-hover: var(--shadow-xl);
+
+
+  /* ── Easing (exponential — Impeccable §motion) ────────────── */
+  /*
+   * "Never animate CSS layout properties."
+   * "Use exponential easing curves — no bounce or elastic."
+   */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.50, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.30, 1);
+  --ease-in-quart:  cubic-bezier(0.50, 0, 0.75, 0);
+  --ease-in-out:    cubic-bezier(0.40, 0, 0.20, 1);
+
+  --duration-instant: 80ms;
+  --duration-fast:    150ms;
+  --duration-normal:  220ms;
+  --duration-slow:    380ms;
+  --duration-slower:  550ms;
+
+  --transition-fast:   var(--duration-fast)   var(--ease-out-quart);
+  --transition-normal: var(--duration-normal) var(--ease-out-quart);
+  --transition-slow:   var(--duration-slow)   var(--ease-out-expo);
+
+  /* Alias de compatibilité */
+  --transition-smooth: var(--duration-slow)   var(--ease-in-out);
+
+
+  /* ── Z-index ─────────────────────────────────────────────── */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+
+
+  /* ── Focus ring ──────────────────────────────────────────── */
+  --focus-ring:        0 0 0 3px rgba(74, 55, 40, 0.22);
+  --focus-ring-danger: 0 0 0 3px rgba(198, 40, 40, 0.22);
+
+
+  /* ── Landing Design System (aliases — compatibilité) ─────── */
+  --l-brown-dark:      var(--brand-espresso);
+  --l-brown-medium:    var(--brand-cacao);
+  --l-brown-muted:     var(--brand-noisette);
+  --l-accent:          var(--brand-caramel);
+  --l-beige-bg:        var(--brand-ivoire);
+  --l-white-pure:      var(--brand-blanc);
+  --l-border-glass:    rgba(74, 55, 40, 0.08);
+  --l-border-radius:   var(--radius-3xl);
+  --l-transition-smooth: var(--transition-slow);
+}
+
+
+/* ── Reset minimal ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--line-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: var(--font-display);
+  line-height: var(--line-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Focus visible accessible */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
