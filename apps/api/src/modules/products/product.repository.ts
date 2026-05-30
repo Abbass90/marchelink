@@ -126,12 +126,12 @@ export class ProductRepository {
   async create(organizationId: string, data: {
     sku: string;
     name: string;
-    description?: string;
+    description?: string | undefined;
     price_xof: number;
     stock_qty: number;
     unit: string;
-    image_url?: string;
-    created_by?: string;
+    image_url?: string | undefined;
+    created_by?: string | undefined;
   }): Promise<ProductRow> {
     const [product] = await this.db('products')
       .insert({

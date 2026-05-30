@@ -11,7 +11,7 @@ const connectionUrl =
 
 const db = knexLib({
   client: 'pg',
-  connection: connectionUrl,
+  connection: connectionUrl ?? '',
   migrations: {
     directory: path.join(__dirname, 'migrations'),
     extension: 'ts',
@@ -25,11 +25,11 @@ async function run() {
   if (command === 'latest') {
     const [batch, migrations] = await db.migrate.latest();
     console.log(`Batch ${batch}: ${migrations.length} migrations applied`);
-    migrations.forEach((m) => console.log(`  ✓ ${m}`));
+    migrations.forEach((m: string) => console.log(`  ✓ ${m}`));
   } else if (command === 'rollback') {
     const [batch, migrations] = await db.migrate.rollback();
     console.log(`Batch ${batch}: ${migrations.length} migrations rolled back`);
-    migrations.forEach((m) => console.log(`  ↩ ${m}`));
+    migrations.forEach((m: string) => console.log(`  ↩ ${m}`));
   } else if (command === 'seed') {
     await db.seed.run();
     console.log('Seeds applied');

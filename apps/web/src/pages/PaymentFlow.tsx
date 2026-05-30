@@ -22,14 +22,12 @@ interface Operator {
   id: string;
   name: string;
   color: string;
-  icon: string;
+  logo: string;
 }
 
 const OPERATORS: Operator[] = [
-  { id: 'orange_money', name: 'Orange Money', color: '#FF6600', icon: '🟠' },
-  { id: 'mtn_momo', name: 'MTN MoMo', color: '#FFCC00', icon: '🟡' },
-  { id: 'moov_money', name: 'Moov Money', color: '#0066CC', icon: '🔵' },
-  { id: 'wave', name: 'Wave', color: '#1DC3E4', icon: '🌊' },
+  { id: 'orange_money', name: 'Orange Money', color: '#FF6600', logo: '/logos/orange-money.svg' },
+  { id: 'wave', name: 'Wave', color: '#1DC3E4', logo: '/logos/wave.svg' },
 ];
 
 /* ── Step enum ──────────────────────────────────────── */
@@ -204,9 +202,11 @@ export default function PaymentFlow() {
                   data-testid={`operator-${op.id}`}
                   type="button"
                 >
-                  <span className="pay-operator-icon">
-                    {op.icon}
-                  </span>
+                  <img
+                    className="pay-operator-logo"
+                    src={op.logo}
+                    alt={op.name}
+                  />
                   <span className="pay-operator-name">{op.name}</span>
                 </button>
               ))}

@@ -180,10 +180,8 @@ describe('PaymentFlow — UC-13', () => {
       expect(screen.getByTestId('payment-amount').textContent).toMatch(/42.500 F/);
     });
 
-    it('renders four operator buttons', () => {
+    it('renders two operator buttons (Orange Money + Wave)', () => {
       expect(screen.getByTestId('operator-orange_money')).toBeInTheDocument();
-      expect(screen.getByTestId('operator-mtn_momo')).toBeInTheDocument();
-      expect(screen.getByTestId('operator-moov_money')).toBeInTheDocument();
       expect(screen.getByTestId('operator-wave')).toBeInTheDocument();
     });
 
@@ -206,7 +204,7 @@ describe('PaymentFlow — UC-13', () => {
 
     it('confirm button is disabled with operator but no phone', async () => {
       const user = userEvent.setup();
-      await user.click(screen.getByTestId('operator-mtn_momo'));
+      await user.click(screen.getByTestId('operator-wave'));
 
       expect(screen.getByTestId('payment-confirm')).toBeDisabled();
     });
@@ -342,7 +340,7 @@ describe('PaymentFlow — UC-13', () => {
       });
 
       const user = userEvent.setup();
-      await user.click(screen.getByTestId('operator-mtn_momo'));
+      await user.click(screen.getByTestId('operator-wave'));
       await user.type(screen.getByTestId('payment-phone'), '0700000000');
       await user.click(screen.getByTestId('payment-confirm'));
 

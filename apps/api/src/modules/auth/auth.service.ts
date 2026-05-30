@@ -49,7 +49,7 @@ export class AuthService {
       role: 'buyer',
       first_name: input.first_name,
       last_name: input.last_name,
-      phone: input.phone,
+      ...(input.phone !== undefined ? { phone: input.phone } : {}),
       organization_id: null,
     });
 
@@ -79,7 +79,7 @@ export class AuthService {
           role: 'wholesaler_admin',
           first_name: input.first_name,
           last_name: input.last_name,
-          phone: input.phone,
+          ...(input.phone !== undefined ? { phone: input.phone } : {}),
           organization_id: org.id,
         },
         trx,

@@ -8,7 +8,7 @@ export class ProductService {
   async createProduct(organizationId: string, input: CreateProductInput, userId?: string): Promise<ProductRow> {
     return this.repo.create(organizationId, {
       ...input,
-      created_by: userId,
+      ...(userId !== undefined ? { created_by: userId } : {}),
     });
   }
 

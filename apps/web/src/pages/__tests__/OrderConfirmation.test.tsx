@@ -1,7 +1,35 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import OrderConfirmation from '../OrderConfirmation.js';
+
+/* ── Mock API client ────────────────────────────────── */
+
+const mockFetchOrderForBuyer = vi.fn();
+const mockFetchOrderTimeline = vi.fn();
+
+vi.mock('../../api/client.js', () => ({
+  fetchOrderForBuyer: (...args: unknown[]) => mockFetchOrderForBuyer(...args),
+  fetchOrderTimeline: (...args: unknown[]) => mockFetchOrderTimeline(...args),
+}));
+
+/* ── Factory ─────────────────────────────────────────── */
+
+function makeOrder(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'abcd1234-5678-9012-3456-789012345678',
+    wholesaler_org_id: 'org-111',
+    buyer_user_id: 'buyer-222',
+    status: 'pending',
+    total_xof: '42500',
+    payment_id: null,
+    delivery_id: null,
+    created_at: '2026-05-30T10:00:00Z',
+    updated_at: '2026-05-30T10:00:00Z',
+    items: [],
+    ...overrides,
+  };
+}
 
 /* ── Helper ──────────────────────────────────────────── */
 
@@ -43,80 +71,210 @@ function renderConfirmation(
 /* ── Tests ───────────────────────────────────────────── */
 
 describe('OrderConfirmation — UC-12', () => {
-  it('renders confirmation page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetchOrderTimeline.mockResolvedValue([]);
+  });
+
+  it('renders confirmation page after loading', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder());
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-page')).toBeInTheDocument();
-    expect(screen.getByTestId('confirmation-card')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-page')).toBeInTheDocument();
+      expect(screen.getByTestId('confirmation-card')).toBeInTheDocument();
+    });
   });
 
-  it('displays success title', () => {
+  it('shows loading skeleton while fetching', () => {
+    // Never resolves — stays in loading state
+    mockFetchOrderForBuyer.mockReturnValue(new Promise(() => {}));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+    });
+
+    expect(screen.getByTestId('confirmation-loading')).toBeInTheDocument();
+  });
+
+  it('displays pending title for pending orders', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'pending' }));
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-title').textContent).toContain(
-      'Commande enregistrée',
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Commande enregistrée',
+      );
+    });
   });
 
-  it('displays truncated order ID', () => {
+  it('displays truncated order ID', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder());
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-order-id').textContent).toBe(
-      'ABCD1234',
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-order-id').textContent).toBe(
+        'ABCD1234',
+      );
+    });
   });
 
-  it('displays total formatted in XOF', () => {
+  it('displays total formatted in XOF', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ total_xof: '42500' }));
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-total').textContent).toMatch(
-      /42.500 F/,
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-total').textContent).toMatch(
+        /42.500 F/,
+      );
+    });
   });
 
-  it('renders link to catalog', () => {
+  it('renders link to catalog', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder());
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-catalog-link')).toHaveAttribute(
-      'href',
-      '/buyer/catalog',
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-catalog-link')).toHaveAttribute(
+        'href',
+        '/buyer/catalog',
+      );
+    });
   });
 
-  it('renders link to payment flow', () => {
+  /* ── Pay button conditional on status ────────────── */
+
+  it('shows pay button only when status is accepted', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'accepted' }));
     renderConfirmation('abcd1234-5678-9012-3456', {
       orderId: 'abcd1234-5678-9012-3456',
       totalXof: '42500',
     });
 
-    expect(screen.getByTestId('confirmation-pay-link')).toHaveAttribute(
-      'href',
-      '/buyer/pay/abcd1234-5678-9012-3456',
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-pay-link')).toHaveAttribute(
+        'href',
+        '/buyer/pay/abcd1234-5678-9012-3456',
+      );
+    });
   });
 
-  it('falls back gracefully without location state', () => {
+  it('hides pay button when status is pending', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'pending' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+      totalXof: '42500',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title')).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('confirmation-pay-link')).not.toBeInTheDocument();
+  });
+
+  it('hides pay button when status is paid', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'paid' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+      totalXof: '42500',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Paiement confirmé',
+      );
+    });
+    expect(screen.queryByTestId('confirmation-pay-link')).not.toBeInTheDocument();
+  });
+
+  it('hides pay button when status is delivered', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'delivered' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+      totalXof: '42500',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Commande livrée',
+      );
+    });
+    expect(screen.queryByTestId('confirmation-pay-link')).not.toBeInTheDocument();
+  });
+
+  /* ── Status-specific display ───────────────────────── */
+
+  it('shows accepted title and subtitle', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'accepted' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Commande acceptée',
+      );
+      expect(screen.getByTestId('confirmation-status').textContent).toContain(
+        'Acceptée',
+      );
+    });
+  });
+
+  it('shows shipped title', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'shipped' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Commande expédiée',
+      );
+    });
+  });
+
+  it('shows cancelled title', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'cancelled' }));
+    renderConfirmation('abcd1234-5678-9012-3456', {
+      orderId: 'abcd1234-5678-9012-3456',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-title').textContent).toContain(
+        'Commande annulée',
+      );
+    });
+  });
+
+  /* ── Fallback ──────────────────────────────────────── */
+
+  it('falls back gracefully without location state', async () => {
+    // API fails — component falls back to default pending display
+    mockFetchOrderForBuyer.mockRejectedValue(new Error('Not found'));
     renderConfirmation('fallback1-0000-0000-0000');
 
-    expect(screen.getByTestId('confirmation-order-id').textContent).toBe(
-      'FALLBACK',
-    );
-    // No total shown without state
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-order-id').textContent).toBe(
+        'FALLBACK',
+      );
+    });
+    // No total shown without state and API failed
     expect(screen.queryByTestId('confirmation-total')).not.toBeInTheDocument();
+    // No pay button either (default pending state)
+    expect(screen.queryByTestId('confirmation-pay-link')).not.toBeInTheDocument();
   });
 });

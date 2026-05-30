@@ -156,14 +156,16 @@ export interface BrowseProduct extends Product {
 }
 
 export interface BrowseParams {
-  q?: string;
-  org_id?: string;
-  min_price?: number;
-  max_price?: number;
-  in_stock?: boolean;
-  sort?: 'price_asc' | 'price_desc' | 'name' | 'newest';
-  page?: number;
-  limit?: number;
+  // `| undefined` explicite : permet de passer `key: undefined` au call site
+  // sous exactOptionalPropertyTypes (les filtres optionnels du catalogue).
+  q?: string | undefined;
+  org_id?: string | undefined;
+  min_price?: number | undefined;
+  max_price?: number | undefined;
+  in_stock?: boolean | undefined;
+  sort?: 'price_asc' | 'price_desc' | 'name' | 'newest' | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
 }
 
 export interface PaginatedProducts {
@@ -587,4 +589,23 @@ export function fetchAdminOrgs(): Promise<AdminOrg[]> {
 
 export function fetchAdminOrders(): Promise<AdminOrder[]> {
   return apiFetch<AdminOrder[]>('/admin/orders');
+}
+
+/* ── Assistant IA Types ─────────────────────────────────── */
+
+export interface AssistantTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/* ── Assistant IA API Functions ─────────────────────────── */
+
+export function sendAssistantMessage(
+  message: string,
+  history: AssistantTurn[] = [],
+): Promise<{ reply: string }> {
+  return apiFetch<{ reply: string }>('/assistant/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message, history }),
+  });
 }

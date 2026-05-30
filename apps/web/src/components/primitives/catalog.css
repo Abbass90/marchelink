@@ -941,8 +941,98 @@
 }
 
 .confirmation-status {
-  color: var(--color-warning);
   font-family: var(--font-sans);
+}
+
+.confirmation-status--pending {
+  color: var(--color-warning);
+}
+
+.confirmation-status--accepted {
+  color: var(--color-primary);
+}
+
+.confirmation-status--paid {
+  color: var(--color-success);
+}
+
+.confirmation-status--shipped {
+  color: var(--color-primary);
+}
+
+.confirmation-status--delivered {
+  color: var(--color-success);
+}
+
+.confirmation-status--cancelled,
+.confirmation-status--rejected {
+  color: var(--color-danger);
+}
+
+/* ── Confirmation Skeleton (CLAUDE.md §30) ───────────── */
+
+.confirmation-skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) 0;
+}
+
+.skeleton-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-line {
+  height: 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-line--lg {
+  width: 60%;
+  height: 24px;
+}
+
+.skeleton-line--md {
+  width: 80%;
+}
+
+.skeleton-line--sm {
+  width: 40%;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+
+/* ── Confirmation Error / Retry ──────────────────────── */
+
+.confirmation-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  margin-bottom: var(--space-4);
+}
+
+.confirmation-retry-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
 }
 
 .confirmation-actions {
@@ -1087,9 +1177,11 @@
   box-shadow: 0 0 0 3px var(--color-border-strong);
 }
 
-.pay-operator-icon {
-  font-size: var(--text-3xl);
-  line-height: 1;
+.pay-operator-logo {
+  width: 100%;
+  max-width: 140px;
+  height: 48px;
+  object-fit: contain;
 }
 
 .pay-operator-name {

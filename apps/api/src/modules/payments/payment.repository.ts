@@ -67,10 +67,11 @@ export class PaymentRepository {
   }
 
   async findByOrgId(orgId: string): Promise<PaymentRow[]> {
-    return this.db<PaymentRow>('payments')
+    const rows = await this.db('payments')
       .select(PAYMENT_COLUMNS)
       .where({ wholesaler_org_id: orgId, deleted_at: null })
       .orderBy('created_at', 'desc');
+    return rows as PaymentRow[];
   }
 
   async updateOrderStatus(orderId: string, status: string): Promise<void> {

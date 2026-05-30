@@ -27,3 +27,16 @@ export const webhookRateLimiter = rateLimit({
     message: 'Too many requests, please try again later',
   },
 });
+
+// Assistant IA : 20 req/min/IP (les appels LLM sont coûteux, on limite l'abus).
+export const assistantRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: isDev ? 60 : 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: 'TOO_MANY_REQUESTS',
+    message: 'Too many requests, please try again later',
+  },
+});

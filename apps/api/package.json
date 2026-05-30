@@ -9,14 +9,15 @@
     "start": "node dist/server.js",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:cov": "jest --coverage --coverageReporters=text --coverageReporters=lcov",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:cov": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage --coverageReporters=text --coverageReporters=lcov",
     "db:migrate": "tsx src/db/migrate.ts latest",
     "db:rollback": "tsx src/db/migrate.ts rollback",
     "db:seed": "tsx src/db/migrate.ts seed",
     "db:reset": "pnpm db:rollback && pnpm db:migrate && pnpm db:seed"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@marchelink/shared": "workspace:*",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",

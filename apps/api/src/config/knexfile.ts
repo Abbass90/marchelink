@@ -18,15 +18,15 @@ const shared: Knex.Config = {
 const config: Record<string, Knex.Config> = {
   development: {
     ...shared,
-    connection: process.env.DATABASE_URL,
+    connection: process.env.DATABASE_URL ?? '',
   },
   test: {
     ...shared,
-    connection: process.env.DATABASE_URL_TEST,
+    connection: process.env.DATABASE_URL_TEST ?? '',
   },
   production: {
     ...shared,
-    connection: process.env.DATABASE_URL,
+    connection: process.env.DATABASE_URL ?? '',
     pool: { min: 4, max: 20 },
   },
 };

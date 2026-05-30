@@ -87,10 +87,10 @@ export class AdminRepository {
     }
 
     return {
-      total_users: Number(usersResult.count),
-      total_organizations: Number(orgsResult.count),
-      total_orders: Number(ordersResult.count),
-      total_revenue_xof: Number(revenueResult.total ?? 0),
+      total_users: Number(usersResult?.count ?? 0),
+      total_organizations: Number(orgsResult?.count ?? 0),
+      total_orders: Number(ordersResult?.count ?? 0),
+      total_revenue_xof: Number(revenueResult?.total ?? 0),
       orders_by_status,
     };
   }

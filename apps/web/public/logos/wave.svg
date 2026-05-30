@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" fill="none">
+  <!-- Wave logo: penguin mascot + text -->
+  <!-- Body (black) -->
+  <ellipse cx="35" cy="32" rx="16" ry="20" fill="#1A1A2E"/>
+  <!-- Belly (white) -->
+  <ellipse cx="35" cy="35" rx="9" ry="13" fill="#FFFFFF"/>
+  <!-- Head -->
+  <circle cx="35" cy="15" r="11" fill="#1A1A2E"/>
+  <!-- Eyes -->
+  <circle cx="31" cy="13" r="2.2" fill="#FFFFFF"/>
+  <circle cx="39" cy="13" r="2.2" fill="#FFFFFF"/>
+  <circle cx="31.5" cy="13.2" r="1" fill="#1A1A2E"/>
+  <circle cx="39.5" cy="13.2" r="1" fill="#1A1A2E"/>
+  <!-- Beak -->
+  <path d="M33 17L35 20L37 17Z" fill="#E8832A"/>
+  <!-- Left wing (waving) -->
+  <path d="M19 22Q14 28 16 38L21 36Q20 30 22 26Z" fill="#1A1A2E"/>
+  <!-- Right wing -->
+  <path d="M48 26Q50 30 50 36L45 38Q46 30 44 26Z" fill="#1A1A2E"/>
+  <!-- Feet -->
+  <ellipse cx="29" cy="52" rx="5" ry="2.5" fill="#E8832A"/>
+  <ellipse cx="41" cy="52" rx="5" ry="2.5" fill="#E8832A"/>
+  <!-- Text "wave" -->
+  <text x="62" y="38" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#1BBFDB">wave</text>
+</svg>

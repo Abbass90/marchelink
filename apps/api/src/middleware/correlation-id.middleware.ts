@@ -1,11 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    correlationId: string;
-  }
-}
+// Le type de `req.correlationId` est déclaré globalement dans src/types/express.d.ts.
 
 // CLAUDE.md §22 : chaque requête entrante reçoit un correlation_id (UUID v4)
 // injecté dans le header de réponse et propagé tout au long du cycle.

@@ -59,16 +59,16 @@ export class ProductController {
   browse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const q = req.query;
-      const params: BrowseParams = {
-        q: typeof q.q === 'string' && q.q ? q.q : undefined,
-        org_id: typeof q.org_id === 'string' && q.org_id ? q.org_id : undefined,
-        min_price: q.min_price ? Number(q.min_price) : undefined,
-        max_price: q.max_price ? Number(q.max_price) : undefined,
-        in_stock: q.in_stock === 'true',
-        sort: q.sort as BrowseParams['sort'],
-        page: q.page ? Number(q.page) : undefined,
-        limit: q.limit ? Number(q.limit) : undefined,
-      };
+      // exactOptionalPropertyTypes : on n'ajoute une clé optionnelle que si
+      // elle a une valeur définie (jamais `key: undefined`).
+      const params: BrowseParams = { in_stock: q.in_stock === 'true' };
+      if (typeof q.q === 'string' && q.q) params.q = q.q;
+      if (typeof q.org_id === 'string' && q.org_id) params.org_id = q.org_id;
+      if (q.min_price) params.min_price = Number(q.min_price);
+      if (q.max_price) params.max_price = Number(q.max_price);
+      if (q.sort) params.sort = q.sort as NonNullable<BrowseParams['sort']>;
+      if (q.page) params.page = Number(q.page);
+      if (q.limit) params.limit = Number(q.limit);
       const result = await this.service.browse(params);
       res.json(result);
     } catch (err) {

@@ -2,15 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { TokenPayload } from '../modules/auth/auth.service.js';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: {
-      id: string;
-      role: string;
-      organization_id: string | null;
-    };
-  }
-}
+// Le type de `req.user` est déclaré globalement dans src/types/express.d.ts.
 
 export function requireAuth(req: Request, res: Response, next: NextFunction): void {
   const token = req.cookies?.access_token as string | undefined;

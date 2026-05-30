@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" fill="none">
+  <!-- Orange Money logo: two overlapping arrows -->
+  <!-- Black arrow pointing up-right -->
+  <path d="M28 42L50 8L44 8L22 42L28 42Z" fill="#000000"/>
+  <path d="M50 8L50 24L44 24L44 8L50 8Z" fill="#000000"/>
+  <path d="M50 8L66 8L66 14L50 14L50 8Z" fill="#000000"/>
+  <!-- Orange arrow pointing down-left -->
+  <path d="M52 18L30 52L36 52L58 18L52 18Z" fill="#FF6600"/>
+  <path d="M30 52L30 36L36 36L36 52L30 52Z" fill="#FF6600"/>
+  <path d="M30 52L14 52L14 46L30 46L30 52Z" fill="#FF6600"/>
+  <!-- Text "Orange Money" -->
+  <text x="70" y="28" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#000000">Orange</text>
+  <text x="70" y="43" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#FF6600">Money</text>
+</svg>

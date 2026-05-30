@@ -222,11 +222,16 @@
   position: absolute;
   bottom: 2px;
   left: 0;
-  right: 0;
+  width: 0;
   height: 3px;
   background: var(--color-warning);
-  opacity: 0.25;
+  opacity: 0;
   border-radius: 2px;
+  animation: accentUnderline 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.7s forwards;
+}
+
+@keyframes accentUnderline {
+  to { width: 100%; opacity: 0.25; }
 }
 
 .l-hero-subtitle {
@@ -258,6 +263,8 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: var(--transition-fast);
+  position: relative;
+  overflow: hidden;
 }
 
 .l-btn-primary:hover {
@@ -812,4 +819,64 @@
 .l-footer-text {
   font-size: var(--text-sm);
   color: var(--color-muted);
+}
+
+/* ── Enhanced Micro-animations ───────────────────────── */
+
+/* Shimmer sweep on CTA button hover */
+.l-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transform: skewX(-20deg);
+}
+
+.l-btn-primary:hover::before {
+  animation: shimmerSlide 0.55s ease forwards;
+}
+
+@keyframes shimmerSlide {
+  to { left: 135%; }
+}
+
+/* Category icon bounces on hover */
+.l-cat-card:hover .l-cat-icon {
+  display: inline-block;
+  animation: iconBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35%      { transform: translateY(-10px) scale(1.14); }
+  65%      { transform: translateY(-3px) scale(0.96); }
+}
+
+/* Testimonial card lift on hover */
+.l-testimonial-card {
+  transition: var(--transition-fast);
+}
+
+.l-testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Bento feature icon wiggle on hover */
+.l-bento-card:hover .l-bento-icon {
+  animation: iconWiggle 0.4s ease;
+}
+
+@keyframes iconWiggle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  30%      { transform: scale(1.15) rotate(-8deg); }
+  70%      { transform: scale(1.15) rotate(8deg); }
 }

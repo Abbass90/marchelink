@@ -15,10 +15,10 @@ const EVENTS: OrderEvent[] = [
 /* ── Tests ───────────────────────────────────────────────── */
 
 describe('OrderTimeline', () => {
-  let mockFetch: ReturnType<typeof vi.fn>;
+  let mockFetch: ReturnType<typeof vi.fn<[string], Promise<OrderEvent[]>>>;
 
   beforeEach(() => {
-    mockFetch = vi.fn();
+    mockFetch = vi.fn<[string], Promise<OrderEvent[]>>();
   });
 
   it('affiche le spinner pendant le chargement', () => {

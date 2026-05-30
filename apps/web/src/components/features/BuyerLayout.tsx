@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { useCart } from '../../context/CartContext.js';
 import { useChatUnread } from '../../hooks/useChatUnread.js';
 import { useState, useCallback } from 'react';
+import AssistantWidget from './AssistantWidget.js';
 import '../primitives/layout.css';
 
 export default function BuyerLayout() {
@@ -163,6 +164,9 @@ export default function BuyerLayout() {
       <main className="layout-main">
         <Outlet />
       </main>
+
+      {/* ── Assistant IA flottant ── */}
+      <AssistantWidget />
     </div>
   );
 }
