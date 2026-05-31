@@ -48,6 +48,13 @@
   letter-spacing: var(--tracking-tight);
   text-decoration: none;
   margin-bottom: var(--space-5);
+  /* Indique clairement que le logo est cliquable (retour à l'accueil) */
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.auth-brand:hover {
+  color: var(--color-accent);
 }
 
 .auth-brand-dot {
@@ -57,6 +64,11 @@
   background: var(--color-accent);
   border-radius: 50%;
   flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.auth-brand:hover .auth-brand-dot {
+  transform: scale(1.4);
 }
 
 .auth-title {
