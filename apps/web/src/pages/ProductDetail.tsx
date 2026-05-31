@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchProduct, getFavorites, addFavorite, removeFavorite, ApiError } from '../api/client.js';
-import type { Product } from '../api/client.js';
+import type { BrowseProduct } from '../api/client.js';
 import { useCart, type CartConflict } from '../context/CartContext.js';
 import '../components/primitives/catalog.css';
 import '../components/primitives/auth.css'; /* reuse @keyframes auth-spin */
@@ -18,7 +18,7 @@ export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { addToCart, forceAddToCart } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<BrowseProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -181,8 +181,8 @@ export default function ProductDetail() {
                 {isFavorited ? '♥' : '♡'}
               </button>
             </div>
-            <p className="detail-org">
-              Grossiste {product.organization_id.slice(0, 8)}
+            <p className="detail-org" data-testid="detail-org">
+              Grossiste : {product.org_name}
             </p>
 
             {inStock ? (

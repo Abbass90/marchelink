@@ -1,4 +1,4 @@
-import { ProductRepository, type ProductRow, type BrowseParams, type BrowsePage } from './product.repository.js';
+import { ProductRepository, type ProductRow, type BrowseParams, type BrowsePage, type BrowseProductRow } from './product.repository.js';
 import { NotFoundError } from '../../errors/index.js';
 import type { CreateProductInput, UpdateProductInput } from './product.schema.js';
 
@@ -40,7 +40,7 @@ export class ProductService {
     return product;
   }
 
-  async getByIdPublic(id: string): Promise<ProductRow> {
+  async getByIdPublic(id: string): Promise<BrowseProductRow> {
     const product = await this.repo.findByIdPublic(id);
     if (!product) {
       throw new NotFoundError('Not found');

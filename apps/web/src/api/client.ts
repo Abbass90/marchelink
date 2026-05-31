@@ -194,8 +194,8 @@ export function fetchProducts(params?: BrowseParams): Promise<PaginatedProducts>
   return apiFetch<PaginatedProducts>(`/products/browse${query ? `?${query}` : ''}`);
 }
 
-export function fetchProduct(id: string): Promise<Product> {
-  return apiFetch<Product>(`/products/${id}`);
+export function fetchProduct(id: string): Promise<BrowseProduct> {
+  return apiFetch<BrowseProduct>(`/products/${id}`);
 }
 
 /* ── Order Types ────────────────────────────────────── */

@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CartProvider } from '../../context/CartContext.js';
 import ProductDetail from '../ProductDetail.js';
-import type { Product } from '../../api/client.js';
+import type { BrowseProduct } from '../../api/client.js';
 
 /* ── Mock API ────────────────────────────────────────── */
 
@@ -22,7 +22,7 @@ vi.mock('../../api/client.js', async () => {
 
 /* ── Test Data ───────────────────────────────────────── */
 
-const fakeProduct: Product = {
+const fakeProduct: BrowseProduct = {
   id: 'p-001',
   organization_id: 'org-aaaa-1111-2222-333344445555',
   sku: 'WAX-001',
@@ -33,11 +33,12 @@ const fakeProduct: Product = {
   unit: 'pagne',
   category: 'tissus',
   image_url: null,
+  org_name: "Tissus d'Aya",
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
 };
 
-const outOfStockProduct: Product = {
+const outOfStockProduct: BrowseProduct = {
   ...fakeProduct,
   id: 'p-002',
   stock_qty: 0,
@@ -143,6 +144,10 @@ describe('ProductDetail — UC-10', () => {
 
     it('displays SKU', () => {
       expect(screen.getByTestId('detail-sku').textContent).toContain('WAX-001');
+    });
+
+    it('displays wholesaler name (org_name, not a UUID)', () => {
+      expect(screen.getByTestId('detail-org').textContent).toContain("Tissus d'Aya");
     });
 
     it('displays price formatted in XOF', () => {

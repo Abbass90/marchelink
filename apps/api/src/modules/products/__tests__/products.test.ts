@@ -308,6 +308,8 @@ describe('UC-10: buyer views product detail', () => {
     expect(res.status).toBe(200);
     expect(res.body.name).toBe(validProduct.name);
     expect(res.body.id).toBe(createRes.body.id);
+    // Le détail public expose le nom du grossiste (org_name), pas un UUID.
+    expect(typeof res.body.org_name).toBe('string');
   });
 
   it('returns 404 for non-existent product', async () => {

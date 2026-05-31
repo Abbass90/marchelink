@@ -118,12 +118,21 @@ export class ProductRepository {
       .first();
   }
 
-  async findByIdPublic(id: string): Promise<ProductRow | undefined> {
-    return this.db('products')
-      .select(COLUMNS)
-      .where({ id })
-      .whereNull('deleted_at')
+  async findByIdPublic(id: string): Promise<BrowseProductRow | undefined> {
+    // Jointure avec organizations pour exposer le nom du grossiste (org_name)
+    // sur la page détail produit, au lieu d'un UUID tronqué.
+    const row = await this.db('products as p')
+      .join('organizations as o', 'p.organization_id', 'o.id')
+      .select([
+        'p.id', 'p.organization_id', 'p.sku', 'p.name', 'p.description',
+        'p.price_xof', 'p.stock_qty', 'p.unit', 'p.category', 'p.image_url',
+        'p.created_at', 'p.updated_at',
+        this.db.raw('o.name as org_name'),
+      ])
+      .where('p.id', id)
+      .whereNull('p.deleted_at')
       .first();
+    return row as BrowseProductRow | undefined;
   }
 
   async create(organizationId: string, data: {
