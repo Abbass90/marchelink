@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchProducts, ApiError } from '../api/client.js';
 import type { BrowseProduct, PaginatedProducts, BrowseParams } from '../api/client.js';
 import CatalogFilters from '../components/features/CatalogFilters.js';
+import { categoryLabel } from '../constants/categories.js';
 import '../components/primitives/catalog.css';
 
 const PAGE_SIZE = 12;
@@ -14,6 +15,7 @@ function formatXOF(amount: string): string {
 export default function BuyerCatalog() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [category, setCategory] = useState('');
   const [sort, setSort] = useState<NonNullable<BrowseParams['sort']>>('newest');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -36,6 +38,7 @@ export default function BuyerCatalog() {
     setError(null);
     fetchProducts({
       q: debouncedSearch || undefined,
+      category: category || undefined,
       min_price: minPrice ? Number(minPrice) : undefined,
       max_price: maxPrice ? Number(maxPrice) : undefined,
       in_stock: inStock || undefined,
@@ -50,8 +53,9 @@ export default function BuyerCatalog() {
       }
     }).finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [debouncedSearch, minPrice, maxPrice, inStock, sort, page]);
+  }, [debouncedSearch, category, minPrice, maxPrice, inStock, sort, page]);
 
+  const handleCategory = (v: string) => { setCategory(v); setPage(1); };
   const handleSort = (v: BrowseParams['sort']) => { setSort(v ?? 'newest'); setPage(1); };
   const handleInStock = (v: boolean) => { setInStock(v); setPage(1); };
   const handleMinPrice = (v: string) => { setMinPrice(v); setPage(1); };
@@ -100,6 +104,7 @@ export default function BuyerCatalog() {
 
         <CatalogFilters
           search={search} onSearchChange={setSearch}
+          category={category} onCategoryChange={handleCategory}
           sort={sort} onSortChange={handleSort}
           minPrice={minPrice} onMinPriceChange={handleMinPrice}
           maxPrice={maxPrice} onMaxPriceChange={handleMaxPrice}
@@ -128,7 +133,7 @@ export default function BuyerCatalog() {
                 )}
                 <div className="catalog-card-body">
                   <p className="catalog-card-name">{product.name}</p>
-                  <p className="catalog-card-org">{product.org_name}</p>
+                  <p className="catalog-card-org">{product.org_name} · {categoryLabel(product.category)}</p>
                   <div className="catalog-card-footer">
                     <span className="catalog-card-price">
                       {formatXOF(product.price_xof)}

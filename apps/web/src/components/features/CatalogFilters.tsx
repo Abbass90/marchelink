@@ -1,8 +1,11 @@
 import type { BrowseParams } from '../../api/client.js';
+import { PRODUCT_CATEGORIES, CATEGORY_LABELS } from '../../constants/categories.js';
 
 interface Props {
   search: string;
   onSearchChange: (v: string) => void;
+  category: string;
+  onCategoryChange: (v: string) => void;
   sort: NonNullable<BrowseParams['sort']>;
   onSortChange: (v: BrowseParams['sort']) => void;
   minPrice: string;
@@ -15,6 +18,7 @@ interface Props {
 
 export default function CatalogFilters({
   search, onSearchChange,
+  category, onCategoryChange,
   sort, onSortChange,
   minPrice, onMinPriceChange,
   maxPrice, onMaxPriceChange,
@@ -35,6 +39,22 @@ export default function CatalogFilters({
           onChange={(e) => onSearchChange(e.target.value)}
           data-testid="catalog-search"
         />
+      </div>
+
+      {/* Category row */}
+      <div className="cf-row">
+        <span className="cf-label">Catégorie</span>
+        <select
+          className="cf-sort"
+          value={category}
+          onChange={(e) => onCategoryChange(e.target.value)}
+          data-testid="catalog-category"
+        >
+          <option value="">Toutes catégories</option>
+          {PRODUCT_CATEGORIES.map((c) => (
+            <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+          ))}
+        </select>
       </div>
 
       {/* Price + sort row */}

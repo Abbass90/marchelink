@@ -64,6 +64,7 @@ export class ProductController {
       const params: BrowseParams = { in_stock: q.in_stock === 'true' };
       if (typeof q.q === 'string' && q.q) params.q = q.q;
       if (typeof q.org_id === 'string' && q.org_id) params.org_id = q.org_id;
+      if (typeof q.category === 'string' && q.category) params.category = q.category;
       if (q.min_price) params.min_price = Number(q.min_price);
       if (q.max_price) params.max_price = Number(q.max_price);
       if (q.sort) params.sort = q.sort as NonNullable<BrowseParams['sort']>;

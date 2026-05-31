@@ -9,6 +9,7 @@ export interface ProductRow {
   price_xof: string; // BIGINT comes as string from pg
   stock_qty: number;
   unit: string;
+  category: string;
   image_url: string | null;
   created_at: Date;
   updated_at: Date;
@@ -16,7 +17,7 @@ export interface ProductRow {
 
 const COLUMNS = [
   'id', 'organization_id', 'sku', 'name', 'description',
-  'price_xof', 'stock_qty', 'unit', 'image_url', 'created_at', 'updated_at',
+  'price_xof', 'stock_qty', 'unit', 'category', 'image_url', 'created_at', 'updated_at',
 ] as const;
 
 export interface BrowseProductRow extends ProductRow {
@@ -26,6 +27,7 @@ export interface BrowseProductRow extends ProductRow {
 export interface BrowseParams {
   q?: string;
   org_id?: string;
+  category?: string;
   min_price?: number;
   max_price?: number;
   in_stock?: boolean;
@@ -69,6 +71,7 @@ export class ProductRepository {
         });
       }
       if (params.org_id) qb = qb.where('p.organization_id', params.org_id);
+      if (params.category) qb = qb.where('p.category', params.category);
       if (params.min_price !== undefined) qb = qb.where('p.price_xof', '>=', params.min_price);
       if (params.max_price !== undefined) qb = qb.where('p.price_xof', '<=', params.max_price);
       if (params.in_stock) qb = qb.where('p.stock_qty', '>', 0);
@@ -89,7 +92,7 @@ export class ProductRepository {
     const rows = await buildBase()
       .select([
         'p.id', 'p.organization_id', 'p.sku', 'p.name', 'p.description',
-        'p.price_xof', 'p.stock_qty', 'p.unit', 'p.image_url',
+        'p.price_xof', 'p.stock_qty', 'p.unit', 'p.category', 'p.image_url',
         'p.created_at', 'p.updated_at',
         this.db.raw('o.name as org_name'),
       ])
@@ -130,6 +133,7 @@ export class ProductRepository {
     price_xof: number;
     stock_qty: number;
     unit: string;
+    category?: string | undefined;
     image_url?: string | undefined;
     created_by?: string | undefined;
   }): Promise<ProductRow> {
@@ -142,6 +146,7 @@ export class ProductRepository {
         price_xof: data.price_xof,
         stock_qty: data.stock_qty,
         unit: data.unit,
+        category: data.category ?? 'autre',
         image_url: data.image_url ?? null,
         created_by: data.created_by ?? null,
         updated_by: data.created_by ?? null,

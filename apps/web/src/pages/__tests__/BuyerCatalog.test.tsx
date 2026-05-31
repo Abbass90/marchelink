@@ -24,21 +24,21 @@ vi.mock('../../api/client.js', () => ({
 const PRODUCT_A = {
   id: 'p-001', organization_id: 'org-a', org_name: "Tissus d'Aya",
   sku: 'WAX-001', name: 'Tissu Wax Hollandais', description: 'Tissu premium',
-  price_xof: '15000', stock_qty: 120, unit: 'pagne', image_url: null,
+  price_xof: '15000', stock_qty: 120, unit: 'pagne', category: 'tissus', image_url: null,
   created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z',
 };
 
 const PRODUCT_B = {
   id: 'p-002', organization_id: 'org-a', org_name: "Tissus d'Aya",
   sku: 'RIZ-001', name: 'Riz Parfumé 25kg', description: null,
-  price_xof: '12500', stock_qty: 0, unit: 'sac', image_url: null,
+  price_xof: '12500', stock_qty: 0, unit: 'sac', category: 'alimentaire', image_url: null,
   created_at: '2026-01-02T00:00:00Z', updated_at: '2026-01-02T00:00:00Z',
 };
 
 const PRODUCT_C = {
   id: 'p-003', organization_id: 'org-b', org_name: 'Épices Adjoua',
   sku: 'SAVON-01', name: 'Savon de Marseille', description: null,
-  price_xof: '500', stock_qty: 3000, unit: 'unité', image_url: null,
+  price_xof: '500', stock_qty: 3000, unit: 'unité', category: 'cosmetiques', image_url: null,
   created_at: '2026-01-03T00:00:00Z', updated_at: '2026-01-03T00:00:00Z',
 };
 

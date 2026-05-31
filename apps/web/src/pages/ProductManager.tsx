@@ -8,6 +8,7 @@ import {
   type CreateProductPayload,
   type UpdateProductPayload,
 } from '../api/client.js';
+import { PRODUCT_CATEGORIES, CATEGORY_LABELS } from '../constants/categories.js';
 import '../components/primitives/catalog.css';
 
 function formatXOF(amount: string | number): string {
@@ -32,6 +33,7 @@ interface FormValues {
   price_xof: string;
   stock_qty: string;
   unit: string;
+  category: string;
   image_url: string;
 }
 
@@ -42,6 +44,7 @@ const EMPTY_FORM: FormValues = {
   price_xof: '',
   stock_qty: '',
   unit: 'unité',
+  category: 'autre',
   image_url: '',
 };
 
@@ -139,6 +142,7 @@ export default function ProductManager() {
       price_xof: String(product.price_xof),
       stock_qty: String(product.stock_qty),
       unit: product.unit,
+      category: product.category ?? 'autre',
       image_url: product.image_url ?? '',
     });
     setErrors({});
@@ -184,6 +188,7 @@ export default function ProductManager() {
           price_xof: Number(form.price_xof),
           stock_qty: Number(form.stock_qty),
           unit: form.unit,
+          category: form.category,
           image_url: form.image_url || undefined,
         };
         await updateProduct(editingProduct.id, payload);
@@ -195,6 +200,7 @@ export default function ProductManager() {
           price_xof: Number(form.price_xof),
           stock_qty: Number(form.stock_qty),
           unit: form.unit,
+          category: form.category,
           image_url: form.image_url || undefined,
         };
         await createProduct(payload);
@@ -426,6 +432,21 @@ export default function ProductManager() {
                     rows={3}
                     placeholder="Détails du produit…"
                   />
+                </div>
+
+                <div className="pm-field">
+                  <label className="pm-label" htmlFor="pm-category">Catégorie</label>
+                  <select
+                    id="pm-category"
+                    className="pm-input"
+                    data-testid="pm-field-category"
+                    value={form.category}
+                    onChange={(e) => handleChange('category', e.target.value)}
+                  >
+                    {PRODUCT_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="pm-field-row">

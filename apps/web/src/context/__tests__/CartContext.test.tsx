@@ -19,6 +19,7 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     price_xof: '15000',
     stock_qty: 120,
     unit: 'pagne',
+    category: 'tissus',
     image_url: null,
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',

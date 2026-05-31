@@ -146,6 +146,7 @@ export interface Product {
   price_xof: string; // BIGINT comes as string from pg
   stock_qty: number;
   unit: string;
+  category: string;
   image_url: string | null;
   created_at: string;
   updated_at: string;
@@ -160,6 +161,7 @@ export interface BrowseParams {
   // sous exactOptionalPropertyTypes (les filtres optionnels du catalogue).
   q?: string | undefined;
   org_id?: string | undefined;
+  category?: string | undefined;
   min_price?: number | undefined;
   max_price?: number | undefined;
   in_stock?: boolean | undefined;
@@ -181,6 +183,7 @@ export function fetchProducts(params?: BrowseParams): Promise<PaginatedProducts>
   const qs = new URLSearchParams();
   if (params?.q) qs.set('q', params.q);
   if (params?.org_id) qs.set('org_id', params.org_id);
+  if (params?.category) qs.set('category', params.category);
   if (params?.min_price !== undefined) qs.set('min_price', String(params.min_price));
   if (params?.max_price !== undefined) qs.set('max_price', String(params.max_price));
   if (params?.in_stock) qs.set('in_stock', 'true');
@@ -347,6 +350,7 @@ export interface CreateProductPayload {
   price_xof: number;
   stock_qty: number;
   unit?: string | undefined;
+  category?: string | undefined;
   image_url?: string | undefined;
 }
 
@@ -356,6 +360,7 @@ export interface UpdateProductPayload {
   price_xof?: number | undefined;
   stock_qty?: number | undefined;
   unit?: string | undefined;
+  category?: string | undefined;
   image_url?: string | null | undefined;
 }
 

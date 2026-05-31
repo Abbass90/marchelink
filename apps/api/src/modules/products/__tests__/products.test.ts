@@ -243,6 +243,27 @@ describe('UC-09: buyer browses all wholesalers catalogs', () => {
     expect(res.body.data[0].name).toBe('Poivre Noir');
   });
 
+  it('filtre category=epices retourne uniquement les produits de cette catégorie', async () => {
+    // Les 3 produits du beforeEach n'ont pas de catégorie → défaut 'autre'.
+    await request(app).post('/api/products').set('Cookie', [wholesalerBCookie])
+      .send({ ...validProduct, sku: 'CUR-001', name: 'Curcuma', price_xof: 4000, stock_qty: 10, category: 'epices' });
+
+    const res = await request(app).get('/api/products/browse?category=epices').set('Cookie', [buyerCookie]);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(1);
+    const names = (res.body.data as Array<{ name: string }>).map((p) => p.name);
+    expect(names).toContain('Curcuma');
+    expect(names).not.toContain('Tissu Wax'); // catégorie 'autre'
+  });
+
+  it('chaque produit expose sa catégorie (string) dans le browse', async () => {
+    const res = await request(app).get('/api/products/browse').set('Cookie', [buyerCookie]);
+    expect(res.status).toBe(200);
+    for (const p of res.body.data as Array<{ category: unknown }>) {
+      expect(typeof p.category).toBe('string');
+    }
+  });
+
   it('tri sort=price_asc classe du moins cher au plus cher', async () => {
     const res = await request(app).get('/api/products/browse?sort=price_asc').set('Cookie', [buyerCookie]);
     expect(res.status).toBe(200);
