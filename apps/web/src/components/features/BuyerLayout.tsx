@@ -67,6 +67,18 @@ export default function BuyerLayout() {
           </NavLink>
 
           <NavLink
+            to="/buyer/favorites"
+            className={({ isActive }) =>
+              `layout-nav-link ${isActive ? 'layout-nav-link--active' : ''}`
+            }
+            onClick={closeSidebar}
+            data-testid="nav-favorites"
+          >
+            <span className="layout-nav-icon">⭐</span>
+            <span className="layout-nav-label">Mes Favoris</span>
+          </NavLink>
+
+          <NavLink
             to="/buyer/orders"
             className={({ isActive }) =>
               `layout-nav-link ${isActive ? 'layout-nav-link--active' : ''}`

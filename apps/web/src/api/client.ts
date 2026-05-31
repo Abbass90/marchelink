@@ -596,6 +596,37 @@ export function fetchAdminOrders(): Promise<AdminOrder[]> {
   return apiFetch<AdminOrder[]>('/admin/orders');
 }
 
+/* ── Favorites Types ────────────────────────────────────── */
+
+export interface FavoriteItem {
+  id: string;               // favorites row ID
+  product_id: string;
+  product_name: string;
+  product_sku: string;
+  product_price_xof: string; // BIGINT → string
+  product_stock_qty: number;
+  product_unit: string;
+  product_category: string;
+  product_image_url: string | null;
+  product_organization_id: string;
+  org_name: string;
+  created_at: string;
+}
+
+/* ── Favorites API Functions ────────────────────────────── */
+
+export function getFavorites(): Promise<FavoriteItem[]> {
+  return apiFetch<FavoriteItem[]>('/favorites');
+}
+
+export function addFavorite(productId: string): Promise<{ id: string }> {
+  return apiFetch<{ id: string }>(`/favorites/${productId}`, { method: 'POST' });
+}
+
+export function removeFavorite(productId: string): Promise<void> {
+  return apiFetch<void>(`/favorites/${productId}`, { method: 'DELETE' });
+}
+
 /* ── Assistant IA Types ─────────────────────────────────── */
 
 export interface AssistantTurn {

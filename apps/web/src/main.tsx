@@ -29,6 +29,7 @@ import BuyerChat from './pages/BuyerChat.js';
 import WholesalerChat from './pages/WholesalerChat.js';
 import DeliveryDashboard from './pages/DeliveryDashboard.js';
 import AdminDashboard from './pages/AdminDashboard.js';
+import BuyerFavorites from './pages/BuyerFavorites.js';
 import Settings from './pages/Settings.js';
 
 createRoot(document.getElementById('root')!).render(
@@ -53,6 +54,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/buyer/cart" element={<Cart />} />
                 <Route path="/buyer/order-confirmation/:id" element={<OrderConfirmation />} />
                 <Route path="/buyer/payments" element={<BuyerPayments />} />
+                <Route path="/buyer/favorites" element={<BuyerFavorites />} />
                 <Route path="/buyer/chat" element={<BuyerChat />} />
                 <Route path="/buyer/pay/:orderId" element={<PaymentFlow />} />
                 <Route path="/buyer/settings" element={<Settings />} />

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchProduct, ApiError } from '../api/client.js';
+import { fetchProduct, getFavorites, addFavorite, removeFavorite, ApiError } from '../api/client.js';
 import type { Product } from '../api/client.js';
 import { useCart, type CartConflict } from '../context/CartContext.js';
 import '../components/primitives/catalog.css';
@@ -24,6 +24,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [conflict, setConflict] = useState<CartConflict | null>(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [isFavorited, setIsFavorited] = useState<boolean>(false);
+  const [favLoading, setFavLoading] = useState(false);
 
   /* ── Fetch product ─────────────────────────────────── */
 
@@ -32,8 +34,9 @@ export default function ProductDetail() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchProduct(id);
+      const [data, favs] = await Promise.all([fetchProduct(id), getFavorites()]);
       setProduct(data);
+      setIsFavorited(favs.some((f) => f.product_id === id));
     } catch (err) {
       const message = err instanceof ApiError
         ? (err.status === 404 ? 'Produit introuvable' : err.message)
@@ -43,6 +46,24 @@ export default function ProductDetail() {
       setLoading(false);
     }
   }, [id]);
+
+  const handleFavoriteToggle = useCallback(async () => {
+    if (!product || favLoading) return;
+    setFavLoading(true);
+    const nextState = !isFavorited;
+    setIsFavorited(nextState); // optimistic
+    try {
+      if (nextState) {
+        await addFavorite(product.id);
+      } else {
+        await removeFavorite(product.id);
+      }
+    } catch {
+      setIsFavorited(!nextState); // revert on error
+    } finally {
+      setFavLoading(false);
+    }
+  }, [product, isFavorited, favLoading]);
 
   useEffect(() => {
     void loadProduct();
@@ -146,9 +167,20 @@ export default function ProductDetail() {
             <span className="detail-sku" data-testid="detail-sku">
               SKU: {product.sku}
             </span>
-            <h1 className="detail-name" data-testid="detail-name">
-              {product.name}
-            </h1>
+            <div className="detail-name-row">
+              <h1 className="detail-name" data-testid="detail-name">
+                {product.name}
+              </h1>
+              <button
+                className={`detail-fav-btn${isFavorited ? ' detail-fav-btn--active' : ''}`}
+                onClick={() => void handleFavoriteToggle()}
+                disabled={favLoading}
+                aria-label={isFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                data-testid="fav-toggle"
+              >
+                {isFavorited ? '♥' : '♡'}
+              </button>
+            </div>
             <p className="detail-org">
               Grossiste {product.organization_id.slice(0, 8)}
             </p>

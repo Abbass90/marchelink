@@ -4096,3 +4096,77 @@
     font-size: var(--text-xs);
   }
 }
+
+/* ── Favorites ──────────────────────────────────────────── */
+
+/* Heart button on product detail */
+.detail-name-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.detail-fav-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-muted);
+  padding: var(--space-1);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.detail-fav-btn:hover:not(:disabled) { transform: scale(1.2); }
+.detail-fav-btn--active { color: #e53e3e; }
+.detail-fav-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Favorites page: card with action row beneath the link */
+.fav-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+.fav-card-link {
+  display: contents; /* renders children as if the link didn't exist */
+  color: inherit;
+  text-decoration: none;
+}
+/* override: the link wraps img + body; make card flex column */
+.fav-card .catalog-card-img,
+.fav-card .catalog-card-img-placeholder {
+  pointer-events: none; /* let the link handle clicks */
+}
+.fav-card-actions {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.fav-add-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.fav-add-btn:disabled { opacity: 0.5; cursor: default; }
+.fav-add-btn:hover:not(:disabled) { opacity: 0.9; }
+.fav-remove-btn {
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: #e53e3e;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fav-remove-btn:hover:not(:disabled) { background: #fff0f0; }
+.fav-remove-btn:disabled { opacity: 0.5; cursor: default; }

@@ -16,6 +16,7 @@ import { dashboardRouter } from './modules/dashboard/dashboard.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
 import { chatRouter } from './modules/chat/chat.routes.js';
 import { assistantRouter } from './modules/assistant/assistant.routes.js';
+import { favoritesRouter } from './modules/favorites/favorite.routes.js';
 import { logger } from './config/logger.js';
 
 const app = express();
@@ -48,6 +49,7 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/assistant', assistantRateLimiter, assistantRouter);
+app.use('/api/favorites', favoritesRouter);
 
 // Error handler centralisé (CLAUDE.md §21)
 app.use(errorHandler);
