@@ -31,7 +31,10 @@ services:
     buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm -F api build
     # Plan `free` : `preDeployCommand` non supporté → on enchaîne migrations Knex
     # puis démarrage dans le `startCommand` (migrate idempotent, rejoué à chaque deploy).
-    startCommand: pnpm -F api db:migrate && pnpm -F api start
+    # ⚠️ TEMPORAIRE : `db:seed` injecte les données de démo une fois en prod.
+    # À RETIRER après le 1er déploiement réussi (le seed efface tout à chaque run →
+    # un cold-start du plan free rejouerait le wipe). Revenir à : db:migrate && start.
+    startCommand: pnpm -F api db:migrate && pnpm -F api db:seed && pnpm -F api start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
