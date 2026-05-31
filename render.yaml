@@ -25,7 +25,10 @@ services:
     region: frankfurt
     plan: free
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm -F api build
+    # `--prod=false` : NODE_ENV=production fait sauter les devDeps à pnpm, or le
+    # build (tsc + @types/*) ET les migrations runtime (tsx) en ont besoin. Render
+    # ne purge pas les devDeps après build → tsx reste dispo pour `db:migrate`.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm -F api build
     # Plan `free` : `preDeployCommand` non supporté → on enchaîne migrations Knex
     # puis démarrage dans le `startCommand` (migrate idempotent, rejoué à chaque deploy).
     startCommand: pnpm -F api db:migrate && pnpm -F api start
