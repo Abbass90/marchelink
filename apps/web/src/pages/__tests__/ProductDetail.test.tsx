@@ -15,6 +15,8 @@ vi.mock('../../api/client.js', async () => {
   return {
     ...actual,
     fetchProduct: (...args: unknown[]) => mockFetchProduct(...args),
+    // getFavorites must be mocked so loadProduct's Promise.all always resolves
+    getFavorites: () => Promise.resolve([]),
   };
 });
 

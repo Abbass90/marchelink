@@ -294,6 +294,7 @@ describe('ProductManager — UC-01, UC-02', () => {
       expect(mockCreateProduct).toHaveBeenCalledWith({
         sku: 'SUC-10',
         name: 'Sucre 10 kg',
+        category: 'autre',
         description: undefined,
         price_xof: 8500,
         stock_qty: 100,

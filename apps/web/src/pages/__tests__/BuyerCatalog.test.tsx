@@ -103,8 +103,10 @@ describe('BuyerCatalog — UC-09', () => {
     });
 
     it('affiche le nom de l\'organisation (org_name) à la place de l\'UUID', () => {
-      expect(screen.getAllByText("Tissus d'Aya")).toHaveLength(2);
-      expect(screen.getByText('Épices Adjoua')).toBeInTheDocument();
+      // org_name is rendered alongside category label (e.g. "Tissus d'Aya · Tissus")
+      // so we use a regex partial match instead of exact string
+      expect(screen.getAllByText(/Tissus d'Aya/)).toHaveLength(2);
+      expect(screen.getByText(/Épices Adjoua/)).toBeInTheDocument();
     });
 
     it('affiche le badge En stock pour les produits disponibles', () => {
