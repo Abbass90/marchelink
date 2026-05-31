@@ -28,6 +28,13 @@ test-results/
 apps/web/src/**/*.js
 apps/web/src/**/*.js.map
 
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Local tooling (spécifique machine / session — ne pas versionner)
+.npmrc
+.claude/
+
 # Docker
 *.pid
 .gstack/
