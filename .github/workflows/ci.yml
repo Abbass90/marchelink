@@ -40,4 +40,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm test
+      # API : avec couverture — applique le gate §26 (70% services/repos)
+      - run: pnpm -F api test:cov
+      # Web : suite Vitest
+      - run: pnpm -F web test
