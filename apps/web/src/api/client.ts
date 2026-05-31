@@ -627,6 +627,34 @@ export function removeFavorite(productId: string): Promise<void> {
   return apiFetch<void>(`/favorites/${productId}`, { method: 'DELETE' });
 }
 
+/* ── Image Upload ────────────────────────────────────────── */
+
+/**
+ * Upload une image produit vers Cloudinary via l'API.
+ * Utilise FormData (multipart) — pas de Content-Type JSON.
+ */
+export async function uploadProductImage(file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const res = await fetch(`${BASE_URL}/products/upload-image`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+    // Pas de Content-Type : le navigateur le définit automatiquement avec le boundary multipart
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({})) as Record<string, unknown>;
+    throw new ApiError(
+      res.status,
+      typeof body.error === 'string' ? body.error : 'UNKNOWN',
+      typeof body.message === 'string' ? body.message : res.statusText,
+    );
+  }
+  return (await res.json()) as { url: string };
+}
+
 /* ── Assistant IA Types ─────────────────────────────────── */
 
 export interface AssistantTurn {

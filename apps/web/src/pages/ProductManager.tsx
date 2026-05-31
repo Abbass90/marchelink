@@ -9,6 +9,7 @@ import {
   type UpdateProductPayload,
 } from '../api/client.js';
 import { PRODUCT_CATEGORIES, CATEGORY_LABELS } from '../constants/categories.js';
+import ProductImageUpload from '../components/features/ProductImageUpload.js';
 import '../components/primitives/catalog.css';
 
 function formatXOF(amount: string | number): string {
@@ -484,33 +485,26 @@ export default function ProductManager() {
                   </div>
                 </div>
 
-                <div className="pm-field-row">
-                  <div className="pm-field">
-                    <label className="pm-label" htmlFor="pm-unit">Unité</label>
-                    <input
-                      id="pm-unit"
-                      className={`pm-input ${errors.unit ? 'pm-input--error' : ''}`}
-                      data-testid="pm-field-unit"
-                      value={form.unit}
-                      onChange={(e) => handleChange('unit', e.target.value)}
-                      onBlur={() => handleBlur('unit')}
-                      placeholder="kg"
-                    />
-                    {errors.unit && <span className="pm-error-hint" data-testid="pm-error-unit">{errors.unit}</span>}
-                  </div>
-                  <div className="pm-field">
-                    <label className="pm-label" htmlFor="pm-img">Image URL (optionnel)</label>
-                    <input
-                      id="pm-img"
-                      className={`pm-input ${errors.image_url ? 'pm-input--error' : ''}`}
-                      data-testid="pm-field-image"
-                      value={form.image_url}
-                      onChange={(e) => handleChange('image_url', e.target.value)}
-                      onBlur={() => handleBlur('image_url')}
-                      placeholder="https://…"
-                    />
-                    {errors.image_url && <span className="pm-error-hint" data-testid="pm-error-image">{errors.image_url}</span>}
-                  </div>
+                <div className="pm-field">
+                  <label className="pm-label" htmlFor="pm-unit">Unité</label>
+                  <input
+                    id="pm-unit"
+                    className={`pm-input ${errors.unit ? 'pm-input--error' : ''}`}
+                    data-testid="pm-field-unit"
+                    value={form.unit}
+                    onChange={(e) => handleChange('unit', e.target.value)}
+                    onBlur={() => handleBlur('unit')}
+                    placeholder="kg"
+                  />
+                  {errors.unit && <span className="pm-error-hint" data-testid="pm-error-unit">{errors.unit}</span>}
+                </div>
+
+                <div className="pm-field">
+                  <label className="pm-label">Photo du produit (optionnel)</label>
+                  <ProductImageUpload
+                    value={form.image_url}
+                    onChange={(url) => handleChange('image_url', url)}
+                  />
                 </div>
 
                 <div className="pm-modal-actions">

@@ -3,6 +3,7 @@ import { ProductService } from './product.service.js';
 import { CreateProductSchema, UpdateProductSchema } from './product.schema.js';
 import { ValidationError } from '../../errors/index.js';
 import type { BrowseParams } from './product.repository.js';
+import { getCloudinary } from '../../config/cloudinary.js';
 
 export class ProductController {
   constructor(private readonly service: ProductService) {}
@@ -91,6 +92,36 @@ export class ProductController {
       const orgId = req.user!.organization_id!;
       await this.service.deleteProduct(req.params.id!, orgId);
       res.status(204).end();
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  uploadImage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.file) {
+        throw new ValidationError('Aucun fichier reçu');
+      }
+      const buffer = req.file.buffer;
+      const cld = getCloudinary();
+      const url = await new Promise<string>((resolve, reject) => {
+        cld.uploader.upload_stream(
+          {
+            folder: 'marchelink/products',
+            resource_type: 'image',
+            // Redimensionne côté serveur : max 800×800, qualité auto
+            transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
+          },
+          (err, result) => {
+            if (err ?? !result) {
+              reject(err ?? new Error('Upload Cloudinary échoué'));
+            } else {
+              resolve(result.secure_url);
+            }
+          },
+        ).end(buffer);
+      });
+      res.json({ url });
     } catch (err) {
       next(err);
     }

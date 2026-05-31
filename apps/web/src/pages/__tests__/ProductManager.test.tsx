@@ -252,7 +252,7 @@ describe('ProductManager — UC-01, UC-02', () => {
     expect(screen.getByTestId('pm-error-stock').textContent).toBe('Stock entier positif requis');
   });
 
-  it('validates image URL format on blur', async () => {
+  it('affiche le bouton photo dans le formulaire produit', async () => {
     mockFetchMyProducts.mockResolvedValueOnce(PRODUCTS);
     renderManager();
 
@@ -261,10 +261,9 @@ describe('ProductManager — UC-01, UC-02', () => {
     });
 
     fireEvent.click(screen.getByTestId('pm-add-btn'));
-
-    fireEvent.change(screen.getByTestId('pm-field-image'), { target: { value: 'not-a-url' } });
-    fireEvent.blur(screen.getByTestId('pm-field-image'));
-    expect(screen.getByTestId('pm-error-image')).toBeInTheDocument();
+    // Le composant ProductImageUpload remplace le champ URL texte
+    expect(screen.getByTestId('pm-image-upload-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('pm-image-upload-btn').textContent).toBe('📷 Choisir une photo');
   });
 
   /* Form Submit — Create ─────────────────────────────── */
