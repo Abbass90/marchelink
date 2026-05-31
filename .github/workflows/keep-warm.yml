@@ -1,0 +1,43 @@
+name: keep-warm
+
+# Garde l'API Render (plan free) éveillée en pingant /health régulièrement.
+# Render free met le service en veille après ~15 min d'inactivité → sans ça,
+# l'utilisateur réel subit un cold-start de 30-50s au premier chargement.
+#
+# ⚠️ Compromis : l'instance reste quasi always-on → ~730h/mois sur les 750h
+#    gratuites Render/compte. Si tu ajoutes un AUTRE service web free, tu
+#    dépasseras le quota. Le service statique (web) ne compte pas, il ne dort pas.
+#
+# Note : GitHub désactive les workflows planifiés après 60 jours sans commit
+#        sur le repo (on commite régulièrement → pas de souci).
+
+on:
+  schedule:
+    # Toutes les ~10 min. GitHub peut retarder l'exécution en période de charge ;
+    # même tardif, le ping réveille l'instance pour l'utilisateur suivant.
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {} # bouton "Run workflow" pour tester à la main
+
+# Évite l'empilement si une exécution traîne (cold start long).
+concurrency:
+  group: keep-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API /health
+        run: |
+          for i in 1 2 3; do
+            if curl -sSf -m 30 https://marchelink-api.onrender.com/health; then
+              echo ""
+              echo "API warm ✅ (tentative $i)"
+              exit 0
+            fi
+            echo "Tentative $i échouée (cold start en cours ?), retry dans 10s…"
+            sleep 10
+          done
+          # On ne fait pas échouer le job : le ping a quand même réveillé
+          # l'instance, inutile de spammer des emails d'échec pendant un deploy.
+          echo "⚠️ /health n'a pas répondu après 3 tentatives — à vérifier si ça persiste."
