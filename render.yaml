@@ -26,9 +26,9 @@ services:
     plan: free
     rootDir: .
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm -F api build
-    # Migrations Knex exécutées avant chaque déploiement (via tsx, fichiers .ts).
-    preDeployCommand: pnpm -F api db:migrate
-    startCommand: pnpm -F api start
+    # Plan `free` : `preDeployCommand` non supporté → on enchaîne migrations Knex
+    # puis démarrage dans le `startCommand` (migrate idempotent, rejoué à chaque deploy).
+    startCommand: pnpm -F api db:migrate && pnpm -F api start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
