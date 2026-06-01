@@ -3,7 +3,7 @@ import { sendAssistantMessage, type AssistantTurn } from '../../api/client.js';
 import '../primitives/assistant.css';
 
 const WELCOME =
-  "Bonjour 👋 Je suis l'assistant MarchéLink. Je peux vous aider à trouver des produits ou suivre vos commandes. Que cherchez-vous ?";
+  "Bonjour, je suis l'assistant MarchéLink. Je peux vous aider à trouver des produits, suivre vos commandes ou en passer une. Que cherchez-vous ?";
 
 export default function AssistantWidget() {
   const [open, setOpen] = useState(false);

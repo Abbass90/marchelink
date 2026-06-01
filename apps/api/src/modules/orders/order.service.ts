@@ -79,6 +79,48 @@ export class OrderService {
     }
   }
 
+  /**
+   * Devis en LECTURE SEULE : valide que les produits appartiennent bien au
+   * grossiste, calcule le total et l'état du stock, SANS rien écrire. Sert au
+   * récapitulatif que l'assistant présente avant confirmation (preparer_commande).
+   */
+  async quoteOrder(dto: PlaceOrderDto) {
+    const { wholesaler_org_id, items } = dto;
+    const productIds = items.map((i) => i.product_id);
+
+    const products = await this.repo.getProductsByIds(productIds, wholesaler_org_id);
+    if (products.length !== productIds.length) {
+      throw new ValidationError('One or more products not found in this wholesaler catalog');
+    }
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    let totalXof = 0;
+    const lignes = items.map((item) => {
+      const product = productMap.get(item.product_id)!;
+      const unitPrice = Number(product.price_xof);
+      const lineTotal = unitPrice * item.quantity;
+      totalXof += lineTotal;
+      return {
+        product_id: item.product_id,
+        nom: product.name,
+        unite: product.unit,
+        quantite: item.quantity,
+        prix_unitaire_xof: unitPrice,
+        total_ligne_xof: lineTotal,
+        en_stock: product.stock_qty >= item.quantity,
+        stock_disponible: product.stock_qty,
+      };
+    });
+
+    return {
+      grossiste_id: wholesaler_org_id,
+      lignes,
+      total_xof: totalXof,
+      tout_en_stock: lignes.every((l) => l.en_stock),
+    };
+  }
+
   async listByOrg(orgId: string) {
     return this.repo.findAllByOrg(orgId);
   }

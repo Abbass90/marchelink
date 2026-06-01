@@ -13,7 +13,7 @@ export class AssistantController {
         return;
       }
       const { message, history } = parsed.data;
-      const result = await this.service.chat(message, history, req.user!.id);
+      const result = await this.service.chat(message, history, req.user!.id, req.correlationId);
       res.json(result);
     } catch (err) {
       next(err);

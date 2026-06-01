@@ -124,9 +124,9 @@ export class OrderRepository {
     return updated;
   }
 
-  async getProductsByIds(productIds: string[], orgId: string): Promise<Array<{ id: string; price_xof: string; stock_qty: number; organization_id: string }>> {
+  async getProductsByIds(productIds: string[], orgId: string): Promise<Array<{ id: string; name: string; price_xof: string; stock_qty: number; unit: string; organization_id: string }>> {
     return this.db('products')
-      .select('id', 'price_xof', 'stock_qty', 'organization_id')
+      .select('id', 'name', 'price_xof', 'stock_qty', 'unit', 'organization_id')
       .whereIn('id', productIds)
       .andWhere({ organization_id: orgId, deleted_at: null });
   }
