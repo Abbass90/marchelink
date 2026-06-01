@@ -82,6 +82,20 @@ describe('BuyerCatalog — UC-09', () => {
       expect(screen.getByText('Réessayer')).toBeInTheDocument();
     });
 
+    it('le bouton Réessayer relance vraiment le fetch et affiche la grille', async () => {
+      mockFetchProducts.mockRejectedValueOnce(new Error('Network error'));
+      renderCatalog();
+      await waitFor(() => expect(screen.getByTestId('catalog-error')).toBeInTheDocument());
+
+      // L'API répond correctement au retry → la grille doit apparaître.
+      mockFetchProducts.mockResolvedValue(makePage());
+      const user = userEvent.setup();
+      await user.click(screen.getByText('Réessayer'));
+
+      await waitFor(() => expect(screen.getByTestId('catalog-grid')).toBeInTheDocument());
+      expect(screen.getAllByTestId('catalog-card')).toHaveLength(3);
+    });
+
     it('affiche la grille de produits après chargement réussi', async () => {
       mockFetchProducts.mockResolvedValue(makePage());
       renderCatalog();

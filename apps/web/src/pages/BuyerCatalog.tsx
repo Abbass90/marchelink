@@ -21,6 +21,7 @@ export default function BuyerCatalog() {
   const [maxPrice, setMaxPrice] = useState('');
   const [inStock, setInStock] = useState(false);
   const [page, setPage] = useState(1);
+  const [reloadKey, setReloadKey] = useState(0);
   const [data, setData] = useState<PaginatedProducts | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +54,7 @@ export default function BuyerCatalog() {
       }
     }).finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [debouncedSearch, category, minPrice, maxPrice, inStock, sort, page]);
+  }, [debouncedSearch, category, minPrice, maxPrice, inStock, sort, page, reloadKey]);
 
   const handleCategory = (v: string) => { setCategory(v); setPage(1); };
   const handleSort = (v: BrowseParams['sort']) => { setSort(v ?? 'newest'); setPage(1); };
@@ -85,7 +86,7 @@ export default function BuyerCatalog() {
         <div className="catalog-container">
           <div className="catalog-error" data-testid="catalog-error">
             <p className="catalog-error-text">{error}</p>
-            <button className="catalog-retry-btn" onClick={() => setPage((p) => p)}>
+            <button className="catalog-retry-btn" onClick={() => setReloadKey((k) => k + 1)}>
               Réessayer
             </button>
           </div>

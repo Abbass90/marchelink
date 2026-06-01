@@ -39,7 +39,12 @@ type AuthContextValue = AuthState & AuthActions & { isAuthenticated: boolean };
 
 /* ── Context ─────────────────────────────────────────── */
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+/**
+ * Exporté pour permettre une lecture *optionnelle* de l'auth ailleurs
+ * (ex. CartContext via useContext(AuthContext) qui tolère `null` hors provider).
+ * Utiliser le hook `useAuth()` pour une consommation normale (qui throw si absent).
+ */
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 /* ── Auto-Refresh Interval (12 min — before the 15 min access TTL) ── */
 

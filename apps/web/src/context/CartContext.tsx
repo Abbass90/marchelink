@@ -5,9 +5,11 @@ import {
   useCallback,
   useMemo,
   useEffect,
+  useRef,
   type ReactNode,
 } from 'react';
 import type { Product } from '../api/client.js';
+import { AuthContext } from '../hooks/useAuth.js';
 
 /* ── Types ──────────────────────────────────────────── */
 
@@ -80,6 +82,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     saveCartToStorage(items);
   }, [items]);
+
+  /* ── Vider le panier quand l'utilisateur change ──────
+   * Lecture *optionnelle* de l'auth : hors AuthProvider (ex. tests unitaires du
+   * panier), useContext renvoie null → userId reste null → aucun effet de bord.
+   * Règle : on vide à la déconnexion (A→null) ou au changement de compte (A→B),
+   * mais on conserve le panier au boot / 1ʳᵉ connexion (null→A). */
+  const auth = useContext(AuthContext);
+  const userId = auth?.user?.id ?? null;
+  const prevUserIdRef = useRef<string | null>(userId);
+
+  useEffect(() => {
+    const prevUserId = prevUserIdRef.current;
+    if (prevUserId !== null && prevUserId !== userId) {
+      setItems([]);
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        /* stockage indisponible — l'état React vidé suffit */
+      }
+    }
+    prevUserIdRef.current = userId;
+  }, [userId]);
 
   /* Derived: current wholesaler org */
   const wholesalerOrgId = useMemo(() => {

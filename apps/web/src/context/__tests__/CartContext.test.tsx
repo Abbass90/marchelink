@@ -1,7 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CartProvider, useCart } from '../CartContext.js';
-import type { Product } from '../../api/client.js';
+import { AuthContext } from '../../hooks/useAuth.js';
+import type { Product, UserProfile } from '../../api/client.js';
 import type { ReactNode } from 'react';
 
 /* ── Test Data ───────────────────────────────────────── */
@@ -302,6 +303,102 @@ describe('CartContext — UC-11', () => {
       const { result } = renderHook(() => useCart(), { wrapper });
 
       expect(result.current.items).toHaveLength(0);
+    });
+  });
+
+  describe('Vidage à la déconnexion (appareil partagé)', () => {
+    function makeUser(id: string): UserProfile {
+      return {
+        id,
+        email: `${id}@test.ci`,
+        role: 'buyer',
+        organization_id: null,
+        first_name: 'Test',
+        last_name: 'User',
+        phone: null,
+      };
+    }
+
+    function makeAuthValue(user: UserProfile | null) {
+      return {
+        user,
+        loading: false,
+        error: null,
+        isAuthenticated: user !== null,
+        login: async () => {},
+        register: async () => {},
+        registerWholesaler: async () => {},
+        logout: async () => {},
+        reloadUser: async () => {},
+      };
+    }
+
+    it('vide le panier à la déconnexion (A → null)', () => {
+      let authValue = makeAuthValue(makeUser('user-A'));
+      function Wrapper({ children }: { children: ReactNode }) {
+        return (
+          <AuthContext.Provider value={authValue}>
+            <CartProvider>{children}</CartProvider>
+          </AuthContext.Provider>
+        );
+      }
+      const { result, rerender } = renderHook(() => useCart(), { wrapper: Wrapper });
+
+      act(() => {
+        result.current.addToCart(productA1, 2);
+      });
+      expect(result.current.items).toHaveLength(1);
+
+      authValue = makeAuthValue(null);
+      rerender();
+
+      expect(result.current.items).toHaveLength(0);
+      expect(localStorage.getItem('marchelink_cart')).toBe('[]');
+    });
+
+    it('vide le panier au changement de compte (A → B)', () => {
+      let authValue = makeAuthValue(makeUser('user-A'));
+      function Wrapper({ children }: { children: ReactNode }) {
+        return (
+          <AuthContext.Provider value={authValue}>
+            <CartProvider>{children}</CartProvider>
+          </AuthContext.Provider>
+        );
+      }
+      const { result, rerender } = renderHook(() => useCart(), { wrapper: Wrapper });
+
+      act(() => {
+        result.current.addToCart(productA1, 1);
+      });
+      expect(result.current.items).toHaveLength(1);
+
+      authValue = makeAuthValue(makeUser('user-B'));
+      rerender();
+
+      expect(result.current.items).toHaveLength(0);
+    });
+
+    it('conserve le panier à la 1ʳᵉ connexion (null → A)', () => {
+      let authValue = makeAuthValue(null);
+      function Wrapper({ children }: { children: ReactNode }) {
+        return (
+          <AuthContext.Provider value={authValue}>
+            <CartProvider>{children}</CartProvider>
+          </AuthContext.Provider>
+        );
+      }
+      const { result, rerender } = renderHook(() => useCart(), { wrapper: Wrapper });
+
+      act(() => {
+        result.current.addToCart(productA1, 3);
+      });
+      expect(result.current.items).toHaveLength(1);
+
+      // Connexion initiale : on NE vide PAS (l'utilisateur garde son panier).
+      authValue = makeAuthValue(makeUser('user-A'));
+      rerender();
+
+      expect(result.current.items).toHaveLength(1);
     });
   });
 });
