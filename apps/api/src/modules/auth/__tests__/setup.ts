@@ -32,5 +32,5 @@ export async function teardownTestDb(): Promise<void> {
 
 export async function cleanTables(): Promise<void> {
   const db = getTestDb();
-  await db.raw('TRUNCATE TABLE messages, conversations, order_events, deliveries, payments, order_items, orders, refresh_tokens, users, organizations, products CASCADE');
+  await db.raw('TRUNCATE TABLE messages, conversations, order_events, payments, order_items, orders, refresh_tokens, users, organizations, products CASCADE');
 }

@@ -6,7 +6,7 @@ export const OrderStatusSchema = z.enum([
   'accepted',
   'rejected',
   'paid',
-  'assigned',
+  'shipped',
   'delivered',
   'cancelled',
 ]);

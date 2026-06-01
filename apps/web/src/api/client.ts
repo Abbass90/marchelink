@@ -226,7 +226,6 @@ export interface OrderResponse {
   status: string;
   total_xof: string;
   payment_id: string | null;
-  delivery_id: string | null;
   created_at: string;
   updated_at: string;
   items: OrderItemResponse[];
@@ -265,7 +264,10 @@ export function fetchOrgOrder(orderId: string): Promise<OrderResponse> {
   return apiFetch<OrderResponse>(`/orders/org/${orderId}`);
 }
 
-export function updateOrderStatus(orderId: string, status: 'accepted' | 'rejected'): Promise<OrderResponse> {
+export function updateOrderStatus(
+  orderId: string,
+  status: 'accepted' | 'rejected' | 'shipped' | 'delivered',
+): Promise<OrderResponse> {
   return apiFetch<OrderResponse>(`/orders/org/${orderId}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
@@ -387,50 +389,6 @@ export function updateProduct(id: string, payload: UpdateProductPayload): Promis
 export function deleteProduct(id: string): Promise<void> {
   return apiFetch<void>(`/products/${id}`, {
     method: 'DELETE',
-  });
-}
-
-/* ── Delivery Types ───────────────────────────────────── */
-
-export interface DeliveryResponse {
-  id: string;
-  order_id: string;
-  wholesaler_org_id: string;
-  assigned_to_user_id: string;
-  status: string;
-  completed_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface AvailableOrder {
-  id: string;
-  wholesaler_org_id: string;
-  buyer_user_id: string;
-  status: string;
-  total_xof: string;
-  created_at: string;
-}
-
-/* ── Delivery API Functions ───────────────────────────── */
-
-export function fetchMyDeliveries(): Promise<DeliveryResponse[]> {
-  return apiFetch<DeliveryResponse[]>('/deliveries/mine');
-}
-
-export function fetchAvailableDeliveries(): Promise<AvailableOrder[]> {
-  return apiFetch<AvailableOrder[]>('/deliveries/available');
-}
-
-export function acceptDelivery(orderId: string): Promise<DeliveryResponse> {
-  return apiFetch<DeliveryResponse>(`/deliveries/accept/${orderId}`, {
-    method: 'POST',
-  });
-}
-
-export function completeDelivery(deliveryId: string): Promise<DeliveryResponse> {
-  return apiFetch<DeliveryResponse>(`/deliveries/${deliveryId}/delivered`, {
-    method: 'PATCH',
   });
 }
 

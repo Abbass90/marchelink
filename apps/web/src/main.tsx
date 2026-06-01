@@ -6,7 +6,6 @@ import { CartProvider } from './context/CartContext.js';
 import ProtectedRoute from './components/features/ProtectedRoute.js';
 import BuyerLayout from './components/features/BuyerLayout.js';
 import WholesalerLayout from './components/features/WholesalerLayout.js';
-import DeliveryLayout from './components/features/DeliveryLayout.js';
 import ErrorBoundary from './components/features/ErrorBoundary.js';
 import './components/primitives/tokens.css';
 import Home from './pages/Home.js';
@@ -28,7 +27,6 @@ import BuyerPayments from './pages/BuyerPayments.js';
 import WholesalerPayments from './pages/WholesalerPayments.js';
 import BuyerChat from './pages/BuyerChat.js';
 import WholesalerChat from './pages/WholesalerChat.js';
-import DeliveryDashboard from './pages/DeliveryDashboard.js';
 import AdminDashboard from './pages/AdminDashboard.js';
 import BuyerFavorites from './pages/BuyerFavorites.js';
 import Settings from './pages/Settings.js';
@@ -74,13 +72,6 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="/wholesaler/payments" element={<WholesalerPayments />} />
                   <Route path="/wholesaler/chat" element={<WholesalerChat />} />
                   <Route path="/wholesaler/settings" element={<Settings />} />
-                </Route>
-              </Route>
-
-              {/* ── Delivery routes (sidebar + bottom nav) ── */}
-              <Route element={<ProtectedRoute allowedRoles={['delivery_operator']} />}>
-                <Route element={<DeliveryLayout />}>
-                  <Route path="/delivery" element={<DeliveryDashboard />} />
                 </Route>
               </Route>
 

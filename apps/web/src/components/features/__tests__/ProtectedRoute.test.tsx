@@ -80,7 +80,7 @@ describe('ProtectedRoute', () => {
 
   it('redirects to / when authenticated but wrong role', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u-1', role: 'delivery', email: 'k@t.ci', organization_id: null, first_name: 'K', last_name: 'Y', phone: null },
+      user: { id: 'u-1', role: 'wholesaler_admin', email: 'k@t.ci', organization_id: 'org-1', first_name: 'K', last_name: 'Y', phone: null },
       loading: false,
       error: null,
       isAuthenticated: true,

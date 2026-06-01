@@ -20,7 +20,6 @@ type FieldErrors = Partial<Record<keyof z.infer<typeof LoginFormSchema>, string>
 function dashboardPath(role: string): string {
   if (role === 'buyer')                                        return '/buyer';
   if (role === 'wholesaler_admin' || role === 'wholesaler_seller') return '/wholesaler';
-  if (role === 'delivery_operator')                            return '/delivery';
   if (role === 'platform_admin')                               return '/admin';
   return '/';
 }

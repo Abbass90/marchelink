@@ -270,9 +270,6 @@ export default function Home() {
             <button className="l-nav-link" onClick={() => handleNavigate('/wholesaler')}>
               Grossiste
             </button>
-            <button className="l-nav-link" onClick={() => handleNavigate('/delivery')}>
-              Livreur
-            </button>
             <button className="l-nav-cta" onClick={() => handleNavigate('/buyer')}>
               Commencer <span aria-hidden="true">→</span>
             </button>

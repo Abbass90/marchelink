@@ -7,7 +7,6 @@ export interface OrderRow {
   status: string;
   total_xof: string;
   payment_id: string | null;
-  delivery_id: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -39,7 +38,7 @@ export interface CreateOrderItemData {
 
 const ORDER_COLUMNS = [
   'id', 'wholesaler_org_id', 'buyer_user_id', 'status',
-  'total_xof', 'payment_id', 'delivery_id', 'created_at', 'updated_at',
+  'total_xof', 'payment_id', 'created_at', 'updated_at',
 ];
 
 const ORDER_ITEM_COLUMNS = [

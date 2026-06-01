@@ -30,8 +30,6 @@ function dashboardPath(role: string): string {
       return '/buyer';
     case 'wholesaler':
       return '/wholesaler';
-    case 'delivery':
-      return '/delivery';
     default:
       return '/';
   }

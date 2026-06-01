@@ -179,6 +179,50 @@ export class OrderService {
     return updated;
   }
 
+  /**
+   * Le grossiste expédie une commande payée (paid → shipped). Remplace l'ancien
+   * « self-assign » du livreur : c'est désormais le grossiste qui pilote la logistique.
+   */
+  async shipOrder(orderId: string, orgId: string, actorUserId?: string) {
+    const order = await this.repo.findByIdForWholesaler(orderId, orgId);
+    if (!order) throw new NotFoundError('Order not found');
+    if (order.status !== 'paid') {
+      throw new ValidationError(`Cannot ship order in status '${order.status}'`);
+    }
+    const updated = await this.repo.updateStatus(orderId, orgId, 'shipped');
+    if (this.eventRepo) {
+      await this.eventRepo.insertEvent({
+        order_id: orderId,
+        status: 'shipped',
+        created_by: actorUserId ?? null,
+        updated_by: actorUserId ?? null,
+      });
+    }
+    return updated;
+  }
+
+  /**
+   * Le grossiste confirme la livraison (shipped → delivered). Remplace l'ancien
+   * « markDelivered » du livreur.
+   */
+  async deliverOrder(orderId: string, orgId: string, actorUserId?: string) {
+    const order = await this.repo.findByIdForWholesaler(orderId, orgId);
+    if (!order) throw new NotFoundError('Order not found');
+    if (order.status !== 'shipped') {
+      throw new ValidationError(`Cannot mark delivered an order in status '${order.status}'`);
+    }
+    const updated = await this.repo.updateStatus(orderId, orgId, 'delivered');
+    if (this.eventRepo) {
+      await this.eventRepo.insertEvent({
+        order_id: orderId,
+        status: 'delivered',
+        created_by: actorUserId ?? null,
+        updated_by: actorUserId ?? null,
+      });
+    }
+    return updated;
+  }
+
   async cancelOrder(orderId: string, buyerUserId: string) {
     const order = await this.repo.findByIdForBuyer(orderId, buyerUserId);
     if (!order) throw new NotFoundError('Order not found');

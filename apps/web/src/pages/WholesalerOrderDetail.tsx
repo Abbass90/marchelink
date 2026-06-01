@@ -32,7 +32,7 @@ export default function WholesalerOrderDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleStatus = async (status: 'accepted' | 'rejected') => {
+  const handleStatus = async (status: 'accepted' | 'rejected' | 'shipped' | 'delivered') => {
     if (!id) return;
     setActionLoading(true);
     setActionError(null);
@@ -111,6 +111,34 @@ export default function WholesalerOrderDetail() {
                   onClick={() => void handleStatus('rejected')}
                 >
                   {actionLoading ? '…' : 'Refuser'}
+                </button>
+              </div>
+            )}
+
+            {order.status === 'paid' && (
+              <div className="wo-card-actions wo-card-actions--detail">
+                {actionError && <p className="st-error" data-testid="od-action-error">{actionError}</p>}
+                <button
+                  className="wo-action-btn wo-action-btn--accept"
+                  data-testid="od-ship-btn"
+                  disabled={actionLoading}
+                  onClick={() => void handleStatus('shipped')}
+                >
+                  {actionLoading ? '…' : 'Marquer expédiée'}
+                </button>
+              </div>
+            )}
+
+            {order.status === 'shipped' && (
+              <div className="wo-card-actions wo-card-actions--detail">
+                {actionError && <p className="st-error" data-testid="od-action-error">{actionError}</p>}
+                <button
+                  className="wo-action-btn wo-action-btn--accept"
+                  data-testid="od-deliver-btn"
+                  disabled={actionLoading}
+                  onClick={() => void handleStatus('delivered')}
+                >
+                  {actionLoading ? '…' : 'Marquer livrée'}
                 </button>
               </div>
             )}

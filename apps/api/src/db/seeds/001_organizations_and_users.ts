@@ -10,7 +10,6 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('messages').del();
   await knex('conversations').del();
   await knex('order_events').del();
-  await knex('deliveries').del();
   await knex('payments').del();
   await knex('order_items').del();
   await knex('orders').del();
@@ -34,14 +33,12 @@ export async function seed(knex: Knex): Promise<void> {
   ]);
 
   /* ══════════════════════════════════════════════════════
-     USERS — 6 comptes de test
+     USERS — 4 comptes de test
      ══════════════════════════════════════════════════════ */
 
   const adminId = randomUUID();
   const ayaId = randomUUID();
   const moussaId = randomUUID();
-  const seydouId = randomUUID();
-  const ibrahimId = randomUUID();
   const kouadioId = randomUUID();
 
   await knex('users').insert([
@@ -76,28 +73,6 @@ export async function seed(knex: Knex): Promise<void> {
       first_name: 'Moussa',
       last_name: 'Diallo',
       phone: '+2250701000002',
-    },
-    /* Livreur 1 — org Tissus */
-    {
-      id: seydouId,
-      email: 'seydou@tissus.ci',
-      password_hash: passwordHash,
-      role: 'delivery_operator',
-      organization_id: orgTissusId,
-      first_name: 'Seydou',
-      last_name: 'Traoré',
-      phone: '+2250701000003',
-    },
-    /* Livreur 2 — org Épices */
-    {
-      id: ibrahimId,
-      email: 'ibrahim@epices.ci',
-      password_hash: passwordHash,
-      role: 'delivery_operator',
-      organization_id: orgEpicesId,
-      first_name: 'Ibrahim',
-      last_name: 'Coulibaly',
-      phone: '+2250701000004',
     },
     /* Acheteur (boutiquier) */
     {
@@ -268,10 +243,10 @@ export async function seed(knex: Knex): Promise<void> {
      ══════════════════════════════════════════════════════ */
 
   const order1Id = randomUUID(); // pending  — chez Tissus
-  const order2Id = randomUUID(); // paid     — chez Tissus (disponible pour livraison)
+  const order2Id = randomUUID(); // paid     — chez Tissus (prête à être expédiée)
   const order3Id = randomUUID(); // delivered— chez Épices
   const order4Id = randomUUID(); // accepted — chez Épices (en attente paiement)
-  const order5Id = randomUUID(); // shipped  — chez Tissus (en cours de livraison par Seydou)
+  const order5Id = randomUUID(); // shipped  — chez Tissus (expédiée par le grossiste)
 
   await knex('orders').insert([
     {
@@ -334,7 +309,7 @@ export async function seed(knex: Knex): Promise<void> {
     /* Order 4 — 2x Poivre */
     { id: randomUUID(), order_id: order4Id, product_id: pPoivre, quantity: 2, unit_price_xof: 12000, line_total_xof: 24000 },
 
-    /* Order 5 — 1x Kenté (en livraison) */
+    /* Order 5 — 1x Kenté (expédiée) */
     { id: randomUUID(), order_id: order5Id, product_id: pKente, quantity: 1, unit_price_xof: 32000, line_total_xof: 32000 },
   ]);
 
@@ -386,36 +361,6 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('orders').where({ id: order2Id }).update({ payment_id: pay1Id });
   await knex('orders').where({ id: order3Id }).update({ payment_id: pay2Id });
   await knex('orders').where({ id: order5Id }).update({ payment_id: pay3Id });
-
-  /* ══════════════════════════════════════════════════════
-     DELIVERIES — 1 delivered (order3)
-     ══════════════════════════════════════════════════════ */
-
-  const del1Id = randomUUID(); // livraison terminée — Ibrahim (Épices)
-  const del2Id = randomUUID(); // livraison en cours — Seydou (Tissus)
-
-  await knex('deliveries').insert([
-    {
-      id: del1Id,
-      order_id: order3Id,
-      wholesaler_org_id: orgEpicesId,
-      assigned_to_user_id: ibrahimId,
-      status: 'delivered',
-      completed_at: knex.fn.now(),
-      created_by: moussaId,
-    },
-    {
-      id: del2Id,
-      order_id: order5Id,
-      wholesaler_org_id: orgTissusId,
-      assigned_to_user_id: seydouId,
-      status: 'assigned',
-      created_by: seydouId,
-    },
-  ]);
-
-  await knex('orders').where({ id: order3Id }).update({ delivery_id: del1Id });
-  await knex('orders').where({ id: order5Id }).update({ delivery_id: del2Id });
 
   /* ══════════════════════════════════════════════════════
      ORDER EVENTS — timeline de chaque commande
@@ -480,8 +425,8 @@ export async function seed(knex: Knex): Promise<void> {
       id: randomUUID(),
       order_id: order3Id,
       status: 'delivered',
-      notes: 'Livraison effectuée par Ibrahim Coulibaly',
-      created_by: ibrahimId,
+      notes: 'Commande livrée par Épices du Marché',
+      created_by: moussaId,
     },
 
     /* Order 4 — accepted : placed → accepted */
@@ -526,8 +471,8 @@ export async function seed(knex: Knex): Promise<void> {
       id: randomUUID(),
       order_id: order5Id,
       status: 'shipped',
-      notes: 'Livraison prise en charge par Seydou Traoré',
-      created_by: seydouId,
+      notes: "Commande expédiée par Tissus d'Aya",
+      created_by: ayaId,
     },
   ]);
 
@@ -569,16 +514,12 @@ export async function seed(knex: Knex): Promise<void> {
   console.log("║    aya@tissus.ci      → Tissus d'Aya             ║");
   console.log('║    moussa@epices.ci   → Épices du Marché         ║');
   console.log('║                                                  ║');
-  console.log('║  LIVREURS (delivery_operator)                    ║');
-  console.log("║    seydou@tissus.ci   → Tissus d'Aya             ║");
-  console.log('║    ibrahim@epices.ci  → Épices du Marché         ║');
-  console.log('║                                                  ║');
   console.log('║  ADMIN PLATEFORME                                ║');
   console.log('║    admin@marchelink.ci                           ║');
   console.log('║                                                  ║');
   console.log('║  10 produits • 5 commandes • 3 paiements         ║');
   console.log('║  14 order_events (timelines complètes)           ║');
-  console.log('║  2 livraisons • 2 conversations • 5 messages     ║');
+  console.log('║  2 conversations • 5 messages                    ║');
   console.log('╚══════════════════════════════════════════════════╝');
   console.log('');
 }

@@ -32,7 +32,6 @@ const fakeOrder: OrderResponse = {
   status: 'accepted',
   total_xof: '42500',
   payment_id: null,
-  delivery_id: null,
   created_at: '2026-01-10T00:00:00Z',
   updated_at: '2026-01-10T00:00:00Z',
   items: [

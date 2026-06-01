@@ -26,7 +26,7 @@ vi.mock('../../api/client.js', () => ({
 
 const ORDER = {
   id: 'ord-abc-123', wholesaler_org_id: 'org-1', buyer_user_id: 'u-1',
-  status: 'pending', total_xof: '30000', payment_id: null, delivery_id: null,
+  status: 'pending', total_xof: '30000', payment_id: null,
   created_at: '2025-05-15T09:00:00.000Z', updated_at: '2025-05-15T09:00:00.000Z',
   items: [
     { id: 'i1', order_id: 'ord-abc-123', product_id: 'p1', quantity: 2, unit_price_xof: '15000', line_total_xof: '30000' },

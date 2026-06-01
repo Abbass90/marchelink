@@ -44,7 +44,6 @@ describe('Home — Premium Landing Page', () => {
       const nav = screen.getByTestId('navbar');
       expect(within(nav).getByRole('button', { name: /acheteur/i })).toBeInTheDocument();
       expect(within(nav).getByRole('button', { name: 'Grossiste' })).toBeInTheDocument();
-      expect(within(nav).getByRole('button', { name: /livreur/i })).toBeInTheDocument();
     });
 
     it('renders the CTA button in navbar', () => {

@@ -265,6 +265,81 @@ describe('UC-05: wholesaler accepts or rejects a pending order', () => {
   });
 });
 
+describe('UC-13: wholesaler ships then delivers a paid order', () => {
+  it('marks a paid order as shipped, then delivered', async () => {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    const orderId = orderRes.body.id;
+
+    // Le webhook de paiement n'est pas câblé dans ce test-app : on force 'paid' en base.
+    await getTestDb()('orders').where({ id: orderId }).update({ status: 'paid' });
+
+    const shipRes = await request(app)
+      .patch(`/api/orders/org/${orderId}/status`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ status: 'shipped' });
+    expect(shipRes.status).toBe(200);
+    expect(shipRes.body.status).toBe('shipped');
+
+    const deliverRes = await request(app)
+      .patch(`/api/orders/org/${orderId}/status`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ status: 'delivered' });
+    expect(deliverRes.status).toBe(200);
+    expect(deliverRes.body.status).toBe('delivered');
+  });
+
+  it('cannot ship an order that is not paid (still pending)', async () => {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderRes.body.id}/status`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ status: 'shipped' });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('cannot mark delivered an order that is not shipped (paid)', async () => {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    const orderId = orderRes.body.id;
+
+    await getTestDb()('orders').where({ id: orderId }).update({ status: 'paid' });
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/status`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ status: 'delivered' });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('wholesaler B cannot ship an org A order (404)', async () => {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    const orderId = orderRes.body.id;
+
+    await getTestDb()('orders').where({ id: orderId }).update({ status: 'paid' });
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/status`)
+      .set('Cookie', [wholesalerBCookie])
+      .send({ status: 'shipped' });
+
+    expect(res.status).toBe(404);
+  });
+});
+
 describe('UC-15: buyer cannot see or modify another buyer order', () => {
   it('buyer B cannot view buyer A order', async () => {
     const orderRes = await request(app)

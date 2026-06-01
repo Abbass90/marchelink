@@ -23,7 +23,6 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
     status: 'pending',
     total_xof: '42500',
     payment_id: null,
-    delivery_id: null,
     created_at: '2026-05-30T10:00:00Z',
     updated_at: '2026-05-30T10:00:00Z',
     items: [],

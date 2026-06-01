@@ -69,7 +69,7 @@ export default function WholesalerOrders() {
 
   const pendingCount = orders.filter(o => o.status === 'pending').length;
 
-  const handleAction = async (orderId: string, status: 'accepted' | 'rejected') => {
+  const handleAction = async (orderId: string, status: 'accepted' | 'rejected' | 'shipped' | 'delivered') => {
     setActionId(orderId);
     setActionError(null);
     try {
@@ -214,6 +214,32 @@ export default function WholesalerOrders() {
                     onClick={() => void handleAction(order.id, 'rejected')}
                   >
                     {actionId === order.id ? '…' : 'Refuser'}
+                  </button>
+                </div>
+              )}
+
+              {order.status === 'paid' && (
+                <div className="wo-card-actions">
+                  <button
+                    className="wo-action-btn wo-action-btn--accept"
+                    data-testid="wo-ship-btn"
+                    disabled={actionId === order.id}
+                    onClick={() => void handleAction(order.id, 'shipped')}
+                  >
+                    {actionId === order.id ? '…' : 'Marquer expédiée'}
+                  </button>
+                </div>
+              )}
+
+              {order.status === 'shipped' && (
+                <div className="wo-card-actions">
+                  <button
+                    className="wo-action-btn wo-action-btn--accept"
+                    data-testid="wo-deliver-btn"
+                    disabled={actionId === order.id}
+                    onClick={() => void handleAction(order.id, 'delivered')}
+                  >
+                    {actionId === order.id ? '…' : 'Marquer livrée'}
                   </button>
                 </div>
               )}

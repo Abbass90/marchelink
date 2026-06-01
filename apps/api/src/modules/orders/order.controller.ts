@@ -64,11 +64,23 @@ export class OrderController {
         return;
       }
       const { status } = parsed.data;
+      const orderId = req.params.id!;
+      const orgId = req.user!.organization_id!;
+      const actorId = req.user!.id;
       let order;
-      if (status === 'accepted') {
-        order = await this.service.acceptOrder(req.params.id!, req.user!.organization_id!, req.user!.id);
-      } else {
-        order = await this.service.rejectOrder(req.params.id!, req.user!.organization_id!, req.user!.id);
+      switch (status) {
+        case 'accepted':
+          order = await this.service.acceptOrder(orderId, orgId, actorId);
+          break;
+        case 'rejected':
+          order = await this.service.rejectOrder(orderId, orgId, actorId);
+          break;
+        case 'shipped':
+          order = await this.service.shipOrder(orderId, orgId, actorId);
+          break;
+        case 'delivered':
+          order = await this.service.deliverOrder(orderId, orgId, actorId);
+          break;
       }
       res.json(order);
     } catch (err) {

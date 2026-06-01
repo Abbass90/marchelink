@@ -11,7 +11,9 @@ export const PlaceOrderSchema = z.object({
 });
 
 export const UpdateOrderStatusSchema = z.object({
-  status: z.enum(['accepted', 'rejected']),
+  // Le grossiste pilote tout le cycle aval : pending→accepted/rejected, puis
+  // paid→shipped (expédiée) →delivered (livrée). Plus de livreur séparé.
+  status: z.enum(['accepted', 'rejected', 'shipped', 'delivered']),
 });
 
 export type PlaceOrderDto = z.infer<typeof PlaceOrderSchema>;

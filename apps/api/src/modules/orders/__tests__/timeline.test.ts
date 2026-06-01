@@ -26,9 +26,6 @@ import { OrderEventRepository } from '../order-event.repository.js';
 import { PaymentController } from '../../payments/payment.controller.js';
 import { PaymentService } from '../../payments/payment.service.js';
 import { PaymentRepository } from '../../payments/payment.repository.js';
-import { DeliveryController } from '../../deliveries/delivery.controller.js';
-import { DeliveryService } from '../../deliveries/delivery.service.js';
-import { DeliveryRepository } from '../../deliveries/delivery.repository.js';
 import { setupTestDb, teardownTestDb, cleanTables, getTestDb } from '../../auth/__tests__/setup.js';
 
 /* ── Env ────────────────────────────────────────────────────── */
@@ -59,10 +56,6 @@ function createTimelineTestApp() {
   const paymentRepo    = new PaymentRepository(db);
   const paymentService = new PaymentService(paymentRepo, eventRepo);
   const paymentCtrl    = new PaymentController(paymentService);
-
-  const deliveryRepo    = new DeliveryRepository(db);
-  const deliveryService = new DeliveryService(deliveryRepo, eventRepo);
-  const deliveryCtrl    = new DeliveryController(deliveryService);
 
   const app = express();
   app.use(cookieParser());
@@ -97,11 +90,6 @@ function createTimelineTestApp() {
   payRouter.post('/webhook', paymentCtrl.webhook);
   app.use('/api/payments', payRouter);
 
-  const delRouter = Router();
-  delRouter.post('/accept/:orderId', requireAuth, requireRole('delivery_operator'), deliveryCtrl.acceptOrder);
-  delRouter.patch('/:id/delivered', requireAuth, requireRole('delivery_operator'), deliveryCtrl.markDelivered);
-  app.use('/api/deliveries', delRouter);
-
   app.use(errorHandler);
   return app;
 }
@@ -112,7 +100,6 @@ const app = createTimelineTestApp();
 let orgId: string;
 let wholesalerCookie: string;
 let buyerCookie: string;
-let deliveryCookie: string;
 let productId: string;
 
 function cookieOf(res: request.Response): string {
@@ -138,7 +125,6 @@ beforeEach(async () => {
   await db('users').insert([
     { email: 'wholesaler@test.ci', password_hash: hash, role: 'wholesaler_admin', organization_id: orgId, first_name: 'Admin', last_name: 'W' },
     { email: 'buyer@test.ci',      password_hash: hash, role: 'buyer',            organization_id: null,  first_name: 'Kouadio', last_name: 'B' },
-    { email: 'delivery@test.ci',   password_hash: hash, role: 'delivery_operator', organization_id: orgId, first_name: 'Delivery', last_name: 'D' },
   ]);
 
   const loginW = await request(app).post('/api/auth/login').send({ email: 'wholesaler@test.ci', password: 'Test1234!' });
@@ -146,9 +132,6 @@ beforeEach(async () => {
 
   const loginB = await request(app).post('/api/auth/login').send({ email: 'buyer@test.ci', password: 'Test1234!' });
   buyerCookie = cookieOf(loginB);
-
-  const loginD = await request(app).post('/api/auth/login').send({ email: 'delivery@test.ci', password: 'Test1234!' });
-  deliveryCookie = cookieOf(loginD);
 
   const prodRes = await request(app)
     .post('/api/products')
@@ -188,17 +171,18 @@ describe('F3: Suivi Commande — Timeline visuelle', () => {
         .post('/api/payments/webhook')
         .send({ idempotency_key: idem, status: 'completed', provider_ref: 'CINETPAY_ABC123' });
 
-      // 4 — Delivery operator self-assigns (→ shipped)
+      // 4 — Wholesaler ships (→ shipped)
       const shipRes = await request(app)
-        .post(`/api/deliveries/accept/${orderId}`)
-        .set('Cookie', [deliveryCookie]);
-      expect(shipRes.status).toBe(201);
-      const deliveryId: string = shipRes.body.id;
+        .patch(`/api/orders/org/${orderId}/status`)
+        .set('Cookie', [wholesalerCookie])
+        .send({ status: 'shipped' });
+      expect(shipRes.status).toBe(200);
 
-      // 5 — Mark delivered (→ delivered)
+      // 5 — Wholesaler marks delivered (→ delivered)
       await request(app)
-        .patch(`/api/deliveries/${deliveryId}/delivered`)
-        .set('Cookie', [deliveryCookie]);
+        .patch(`/api/orders/org/${orderId}/status`)
+        .set('Cookie', [wholesalerCookie])
+        .send({ status: 'delivered' });
 
       // Assert timeline
       const tlRes = await request(app)
@@ -243,14 +227,15 @@ describe('F3: Suivi Commande — Timeline visuelle', () => {
         .post('/api/payments/webhook')
         .send({ idempotency_key: initRes.body.idempotency_key, status: 'completed', provider_ref: 'CINETPAY_XYZ' });
 
-      const shipRes = await request(app)
-        .post(`/api/deliveries/accept/${orderId}`)
-        .set('Cookie', [deliveryCookie]);
-      const deliveryId: string = shipRes.body.id;
+      await request(app)
+        .patch(`/api/orders/org/${orderId}/status`)
+        .set('Cookie', [wholesalerCookie])
+        .send({ status: 'shipped' });
 
       await request(app)
-        .patch(`/api/deliveries/${deliveryId}/delivered`)
-        .set('Cookie', [deliveryCookie]);
+        .patch(`/api/orders/org/${orderId}/status`)
+        .set('Cookie', [wholesalerCookie])
+        .send({ status: 'delivered' });
 
       const tlRes = await request(app)
         .get(`/api/orders/org/${orderId}/timeline`)

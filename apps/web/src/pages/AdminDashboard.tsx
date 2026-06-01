@@ -28,7 +28,6 @@ const ROLE_LABELS: Record<string, string> = {
   platform_admin: 'Admin',
   wholesaler_admin: 'Grossiste',
   wholesaler_seller: 'Vendeur',
-  delivery_operator: 'Livreur',
   buyer: 'Acheteur',
 };
 
