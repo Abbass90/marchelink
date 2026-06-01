@@ -55,7 +55,7 @@ services:
       - key: COOKIE_SECURE
         value: "true"
       - key: ANTHROPIC_MODEL
-        value: claude-3-5-sonnet-latest
+        value: claude-sonnet-4-6
       # À définir dans le dashboard après le 1er déploiement :
       - key: ANTHROPIC_API_KEY
         sync: false

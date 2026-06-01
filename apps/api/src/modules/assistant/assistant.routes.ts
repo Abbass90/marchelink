@@ -16,7 +16,7 @@ import { db } from '../../db/knex.js';
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY ?? 'missing-anthropic-api-key',
 });
-const model = process.env.ANTHROPIC_MODEL ?? 'claude-3-5-sonnet-latest';
+const model = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6';
 
 const productService = new ProductService(new ProductRepository(db));
 const orderService = new OrderService(new OrderRepository(db), db, new OrderEventRepository(db));
