@@ -22,6 +22,13 @@ import { logger } from './config/logger.js';
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
 
+// Render (et tout reverse proxy) place l'app derrière un proxy. Sans ceci,
+// Express voit l'IP du proxy au lieu de l'IP réelle du client : express-rate-limit
+// met alors TOUS les visiteurs dans le même seau, et la limite « 5/min/IP » (§19)
+// devient « 5/min pour tout le site ». `1` = on fait confiance à un seul hop (le
+// proxy Render), non usurpable via X-Forwarded-For.
+app.set('trust proxy', 1);
+
 // CLAUDE.md §17 : Helmet à la racine.
 app.use(helmet());
 
