@@ -6,6 +6,7 @@ import type { Knex } from 'knex';
 import { NotFoundError, ValidationError } from '../../errors/index.js';
 import type { RegisterBuyerInput, LoginInput, RegisterWholesalerInput, UpdateProfileInput, ChangePasswordInput } from './auth.schema.js';
 import { EmailService } from '../../email/email.service.js';
+import { logger } from '../../config/logger.js';
 
 /** Durée de validité du token de vérification d'email : 24 heures */
 const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
@@ -97,8 +98,13 @@ export class AuthService {
     // si l'envoi échoue, l'utilisateur pourra redemander un email plus tard.
     void this.emailService
       .sendVerificationEmail({ to: email, firstName, token: rawToken })
-      .catch(() => {
-        // best-effort — l'échec d'envoi ne remet pas en cause l'inscription
+      .catch((err: unknown) => {
+        // best-effort — l'échec d'envoi ne remet pas en cause l'inscription,
+        // mais on le trace pour pouvoir diagnostiquer un SMTP mal configuré.
+        logger.warn(
+          { err, to: email },
+          "Échec d'envoi de l'email de vérification (SMTP) — inscription conservée",
+        );
       });
   }
 
