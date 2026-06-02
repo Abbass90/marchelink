@@ -10,9 +10,19 @@ export interface UserRow {
   first_name: string;
   last_name: string;
   profile_photo: string | null;
+  email_verified_at: Date | null;
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;
+}
+
+export interface EmailVerificationTokenRow {
+  id: string;
+  user_id: string;
+  token_hash: string;
+  expires_at: Date;
+  used_at: Date | null;
+  created_at: Date;
 }
 
 export interface RefreshTokenRow {
@@ -29,7 +39,7 @@ export class AuthRepository {
 
   async findByEmail(email: string): Promise<UserRow | undefined> {
     return this.db('users')
-      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'created_at', 'updated_at', 'deleted_at')
+      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
       .where({ email })
       .whereNull('deleted_at')
       .first();
@@ -37,10 +47,40 @@ export class AuthRepository {
 
   async findById(id: string): Promise<UserRow | undefined> {
     return this.db('users')
-      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'created_at', 'updated_at', 'deleted_at')
+      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
       .where({ id })
       .whereNull('deleted_at')
       .first();
+  }
+
+  // ── Vérification d'email ─────────────────────────────────
+
+  async saveEmailVerificationToken(data: {
+    user_id: string;
+    token_hash: string;
+    expires_at: Date;
+  }): Promise<void> {
+    await this.db('email_verification_tokens').insert(data);
+  }
+
+  async findEmailVerificationToken(tokenHash: string): Promise<EmailVerificationTokenRow | undefined> {
+    return this.db('email_verification_tokens')
+      .select('id', 'user_id', 'token_hash', 'expires_at', 'used_at', 'created_at')
+      .where({ token_hash: tokenHash })
+      .whereNull('used_at')
+      .first();
+  }
+
+  async markEmailVerificationTokenUsed(id: string): Promise<void> {
+    await this.db('email_verification_tokens')
+      .where({ id })
+      .update({ used_at: new Date() });
+  }
+
+  async setEmailVerified(userId: string): Promise<void> {
+    await this.db('users')
+      .where({ id: userId })
+      .update({ email_verified_at: new Date(), updated_at: new Date() });
   }
 
   async createUser(data: {

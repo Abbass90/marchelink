@@ -180,4 +180,24 @@ export class AuthController {
       next(err);
     }
   };
+
+  verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const token = req.query.token as string | undefined;
+      if (!token || typeof token !== 'string' || token.trim() === '') {
+        res.status(422).json({
+          status: 422,
+          error: 'UNPROCESSABLE_ENTITY',
+          message: 'Token de vérification manquant',
+          requestId: req.correlationId,
+        });
+        return;
+      }
+
+      await this.service.verifyEmail(token);
+      res.json({ message: 'Adresse email confirmée. Vous pouvez maintenant vous connecter.' });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

@@ -5,6 +5,10 @@ import { AuthRepository } from './auth.repository.js';
 import type { Knex } from 'knex';
 import { NotFoundError, ValidationError } from '../../errors/index.js';
 import type { RegisterBuyerInput, LoginInput, RegisterWholesalerInput, UpdateProfileInput, ChangePasswordInput } from './auth.schema.js';
+import { EmailService } from '../../email/email.service.js';
+
+/** Durée de validité du token de vérification d'email : 24 heures */
+const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 const BCRYPT_ROUNDS = 12;
 
@@ -25,6 +29,8 @@ export class AuthService {
   private readonly accessTtl: number;
   private readonly refreshTtl: number;
 
+  private readonly emailService: EmailService;
+
   constructor(
     private readonly repo: AuthRepository,
     private readonly db?: Knex,
@@ -33,6 +39,7 @@ export class AuthService {
     this.refreshSecret = process.env.JWT_REFRESH_SECRET!;
     this.accessTtl = Number(process.env.JWT_ACCESS_TTL_SEC ?? 900);
     this.refreshTtl = Number(process.env.JWT_REFRESH_TTL_SEC ?? 604800);
+    this.emailService = new EmailService();
   }
 
   async register(input: RegisterBuyerInput): Promise<{ userId: string }> {
@@ -54,7 +61,44 @@ export class AuthService {
       organization_id: null,
     });
 
+    // Envoyer l'email de vérification
+    await this.sendEmailVerification(user.id, user.email, user.first_name);
+
     return { userId: user.id };
+  }
+
+  /** Génère un token, l'enregistre (haché) et envoie l'email de vérification. */
+  private async sendEmailVerification(userId: string, email: string, firstName: string): Promise<void> {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = this.hashToken(rawToken);
+    const expiresAt = new Date(Date.now() + EMAIL_VERIFY_TOKEN_TTL_MS);
+
+    await this.repo.saveEmailVerificationToken({ user_id: userId, token_hash: tokenHash, expires_at: expiresAt });
+
+    // L'email est envoyé en best-effort : une erreur SMTP ne bloque pas l'inscription
+    await this.emailService
+      .sendVerificationEmail({ to: email, firstName, token: rawToken })
+      .catch(() => {
+        // L'utilisateur pourra redemander un email plus tard
+      });
+  }
+
+  /** Valide le token reçu par email et marque l'email comme vérifié. */
+  async verifyEmail(rawToken: string): Promise<void> {
+    const tokenHash = this.hashToken(rawToken);
+    const record = await this.repo.findEmailVerificationToken(tokenHash);
+
+    if (!record) {
+      throw new ValidationError('Lien de vérification invalide ou déjà utilisé');
+    }
+    if (record.expires_at < new Date()) {
+      throw new ValidationError('Lien de vérification expiré — veuillez vous réinscrire ou contacter le support');
+    }
+
+    await Promise.all([
+      this.repo.markEmailVerificationTokenUsed(record.id),
+      this.repo.setEmailVerified(record.user_id),
+    ]);
   }
 
   async registerWholesaler(input: RegisterWholesalerInput): Promise<{ userId: string; organizationId: string }> {
@@ -91,6 +135,10 @@ export class AuthService {
         .update({ created_by: user.id, updated_by: user.id });
 
       await trx.commit();
+
+      // Envoyer l'email de vérification après commit réussi
+      await this.sendEmailVerification(user.id, user.email, user.first_name);
+
       return { userId: user.id, organizationId: org.id };
     } catch (err) {
       await trx.rollback();
@@ -107,6 +155,11 @@ export class AuthService {
     const valid = await bcrypt.compare(input.password, user.password_hash);
     if (!valid) {
       throw new NotFoundError('Invalid credentials');
+    }
+
+    // Bloquer la connexion si l'email n'a pas encore été vérifié
+    if (!user.email_verified_at) {
+      throw new ValidationError('Veuillez confirmer votre adresse email avant de vous connecter. Vérifiez votre boîte mail.');
     }
 
     return this.generateTokens(user.id, user.role, user.organization_id);

@@ -16,6 +16,7 @@ authRouter.post('/register-wholesaler', controller.registerWholesaler);
 authRouter.post('/login', controller.login);
 authRouter.post('/refresh', controller.refresh);
 authRouter.post('/logout', controller.logout);
+authRouter.get('/verify-email', controller.verifyEmail);
 authRouter.get('/me', requireAuth, controller.me);
 authRouter.patch('/profile', requireAuth, controller.updateProfile);
 authRouter.patch('/password', requireAuth, controller.changePassword);
