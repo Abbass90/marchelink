@@ -8,21 +8,29 @@ export class EmailService {
   private readonly transporter: nodemailer.Transporter;
   private readonly fromAddress: string;
   private readonly appBaseUrl: string;
+  /** true seulement si host + user + pass sont tous présents dans l'environnement */
+  private readonly configured: boolean;
 
   constructor() {
-    const host = process.env.SMTP_HOST!;
+    const host = process.env.SMTP_HOST;
     const port = Number(process.env.SMTP_PORT ?? 587);
-    const user = process.env.SMTP_USER!;
-    const pass = process.env.SMTP_PASS!;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
 
-    this.fromAddress = process.env.SMTP_FROM ?? user;
+    this.configured = Boolean(host && user && pass);
+    this.fromAddress = process.env.SMTP_FROM ?? user ?? 'no-reply@marchelink.dev';
     this.appBaseUrl = process.env.APP_BASE_URL ?? 'http://localhost:5173';
 
     this.transporter = nodemailer.createTransport({
       host,
       port,
       secure: false, // STARTTLS sur le port 587
-      auth: { user, pass },
+      auth: user && pass ? { user, pass } : undefined,
+      // Timeouts courts : en fire-and-forget, on ne veut pas qu'une socket
+      // reste suspendue ~2 min (défaut nodemailer) si le SMTP est injoignable.
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 15_000,
     });
   }
 
@@ -35,6 +43,12 @@ export class EmailService {
     firstName: string;
     token: string;
   }): Promise<void> {
+    // SMTP non configuré → on n'essaie même pas de se connecter (évite un hang
+    // réseau). L'inscription reste valide ; l'email pourra être renvoyé plus tard.
+    if (!this.configured) {
+      return;
+    }
+
     const verifyUrl = `${this.appBaseUrl}/verify-email?token=${encodeURIComponent(params.token)}`;
 
     await this.transporter.sendMail({

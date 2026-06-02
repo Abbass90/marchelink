@@ -90,11 +90,15 @@ export class AuthService {
 
     await this.repo.saveEmailVerificationToken({ user_id: userId, token_hash: tokenHash, expires_at: expiresAt });
 
-    // L'email est envoyé en best-effort : une erreur SMTP ne bloque pas l'inscription
-    await this.emailService
+    // Envoi en FIRE-AND-FORGET : la réponse HTTP d'inscription ne doit JAMAIS
+    // attendre le SMTP. Sans cela, si le serveur SMTP est lent ou non configuré,
+    // la requête /auth/register reste suspendue (~2 min) et le bouton tourne en
+    // boucle côté client. Ici l'inscription a déjà réussi (token sauvegardé) ;
+    // si l'envoi échoue, l'utilisateur pourra redemander un email plus tard.
+    void this.emailService
       .sendVerificationEmail({ to: email, firstName, token: rawToken })
       .catch(() => {
-        // L'utilisateur pourra redemander un email plus tard
+        // best-effort — l'échec d'envoi ne remet pas en cause l'inscription
       });
   }
 
