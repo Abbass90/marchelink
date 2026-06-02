@@ -51,6 +51,7 @@ export async function seed(knex: Knex): Promise<void> {
       organization_id: null,
       first_name: 'Admin',
       last_name: 'MarchéLink',
+      email_verified_at: new Date(),
     },
     /* Grossiste 1 — Tissus d'Aya */
     {
@@ -62,6 +63,7 @@ export async function seed(knex: Knex): Promise<void> {
       first_name: 'Aya',
       last_name: 'Koné',
       phone: '+2250701000001',
+      email_verified_at: new Date(),
     },
     /* Grossiste 2 — Épices du Marché */
     {
@@ -73,6 +75,7 @@ export async function seed(knex: Knex): Promise<void> {
       first_name: 'Moussa',
       last_name: 'Diallo',
       phone: '+2250701000002',
+      email_verified_at: new Date(),
     },
     /* Acheteur (boutiquier) */
     {
@@ -84,6 +87,7 @@ export async function seed(knex: Knex): Promise<void> {
       first_name: 'Kouadio',
       last_name: 'Yao',
       phone: '+2250700000001',
+      email_verified_at: new Date(),
     },
   ]);
 

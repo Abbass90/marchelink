@@ -45,6 +45,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'A',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
 
   await db('users').insert({
@@ -55,6 +56,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'Test',
     phone: '+2250701010102',
+    email_verified_at: new Date(),
   });
 
   // Login
@@ -273,6 +275,7 @@ describe('UC-F4: buyer liste ses paiements', () => {
       first_name: 'Buyer',
       last_name: 'Two',
       phone: '+2250701010199',
+      email_verified_at: new Date(),
     });
     const login2 = await request(app).post('/api/auth/login').send({ email: 'buyer2@test.com', password: 'TestPass123!' });
     const buyer2Cookie = (login2.headers['set-cookie'] as string[])
@@ -337,6 +340,7 @@ describe('UC-F4: grossiste liste les paiements de son org', () => {
       first_name: 'Admin',
       last_name: 'B',
       phone: '+2250701010198',
+      email_verified_at: new Date(),
     });
     const loginB = await request(app).post('/api/auth/login').send({ email: 'admin-b@test.com', password: 'TestPass123!' });
     const wholesalerBCookie = (loginB.headers['set-cookie'] as string[])

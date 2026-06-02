@@ -64,6 +64,7 @@ beforeEach(async () => {
     first_name: 'Wholesaler',
     last_name: 'Upload',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
   await db('users').insert({
     email: 'buyer@test.com',
@@ -73,6 +74,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'Upload',
     phone: '+2250701010102',
+    email_verified_at: new Date(),
   });
 
   const loginW = await request(app).post('/api/auth/login').send({ email: 'wholesaler@test.com', password: 'TestPass123!' });

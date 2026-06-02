@@ -42,6 +42,7 @@ beforeEach(async () => {
     first_name: 'Kouadio',
     last_name: 'Test',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
 
   // Two products in the wholesaler's catalog
@@ -147,6 +148,7 @@ describe('UC-F1: acheteur gère ses favoris', () => {
         first_name: 'WS',
         last_name: 'Test',
         phone: '+2250701010200',
+        email_verified_at: new Date(),
       });
       const wsLogin = await request(app)
         .post('/api/auth/login')
@@ -192,6 +194,7 @@ describe('UC-F1: acheteur gère ses favoris', () => {
         first_name: 'Amani',
         last_name: 'Test',
         phone: '+2250701010199',
+        email_verified_at: new Date(),
       });
       const buyer2Login = await request(app)
         .post('/api/auth/login')

@@ -123,8 +123,8 @@ beforeEach(async () => {
   const hash = await bcrypt.hash('Test1234!', 12);
 
   await db('users').insert([
-    { email: 'wholesaler@test.ci', password_hash: hash, role: 'wholesaler_admin', organization_id: orgId, first_name: 'Admin', last_name: 'W', phone: '+2250701010101' },
-    { email: 'buyer@test.ci',      password_hash: hash, role: 'buyer',            organization_id: null,  first_name: 'Kouadio', last_name: 'B', phone: '+2250701010102' },
+    { email: 'wholesaler@test.ci', password_hash: hash, role: 'wholesaler_admin', organization_id: orgId, first_name: 'Admin', last_name: 'W', phone: '+2250701010101', email_verified_at: new Date() },
+    { email: 'buyer@test.ci',      password_hash: hash, role: 'buyer',            organization_id: null,  first_name: 'Kouadio', last_name: 'B', phone: '+2250701010102', email_verified_at: new Date() },
   ]);
 
   const loginW = await request(app).post('/api/auth/login').send({ email: 'wholesaler@test.ci', password: 'Test1234!' });
@@ -299,7 +299,7 @@ describe('F3: Suivi Commande — Timeline visuelle', () => {
       const hash = await bcrypt.hash('Test1234!', 12);
       await db('users').insert({
         email: 'buyer2@test.ci', password_hash: hash, role: 'buyer',
-        organization_id: null, first_name: 'Other', last_name: 'Buyer', phone: '+2250701010199',
+        organization_id: null, first_name: 'Other', last_name: 'Buyer', phone: '+2250701010199', email_verified_at: new Date(),
       });
       const loginB2 = await request(app).post('/api/auth/login').send({ email: 'buyer2@test.ci', password: 'Test1234!' });
       const buyer2Cookie = cookieOf(loginB2);
@@ -326,7 +326,7 @@ describe('F3: Suivi Commande — Timeline visuelle', () => {
       const hash = await bcrypt.hash('Test1234!', 12);
       await db('users').insert({
         email: 'wholesaler2@test.ci', password_hash: hash, role: 'wholesaler_admin',
-        organization_id: org2!.id, first_name: 'Admin', last_name: 'B', phone: '+2250701010198',
+        organization_id: org2!.id, first_name: 'Admin', last_name: 'B', phone: '+2250701010198', email_verified_at: new Date(),
       });
       const loginW2 = await request(app).post('/api/auth/login').send({ email: 'wholesaler2@test.ci', password: 'Test1234!' });
       const wholesaler2Cookie = cookieOf(loginW2);

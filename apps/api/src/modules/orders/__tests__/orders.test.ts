@@ -48,6 +48,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'A',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
 
   await db('users').insert({
@@ -58,6 +59,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'B',
     phone: '+2250701010102',
+    email_verified_at: new Date(),
   });
 
   await db('users').insert({
@@ -68,6 +70,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'A',
     phone: '+2250701010103',
+    email_verified_at: new Date(),
   });
 
   await db('users').insert({
@@ -78,6 +81,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'B',
     phone: '+2250701010104',
+    email_verified_at: new Date(),
   });
 
   // Login users

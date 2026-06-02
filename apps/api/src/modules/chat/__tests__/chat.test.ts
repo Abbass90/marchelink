@@ -41,21 +41,21 @@ beforeEach(async () => {
 
   const [buyer] = await db('users').insert({
     email: 'buyer@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Kouadio', last_name: 'Yao', phone: '+2250701010101',
+    organization_id: null, first_name: 'Kouadio', last_name: 'Yao', phone: '+2250701010101', email_verified_at: new Date(),
   }).returning('id');
   buyerId = buyer!.id;
 
   await db('users').insert({
     email: 'buyer2@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Ama', last_name: 'Seck', phone: '+2250701010102',
+    organization_id: null, first_name: 'Ama', last_name: 'Seck', phone: '+2250701010102', email_verified_at: new Date(),
   });
   await db('users').insert({
     email: 'admin-a@test.com', password_hash: hash, role: 'wholesaler_admin',
-    organization_id: orgAId, first_name: 'Aya', last_name: 'Koné', phone: '+2250701010103',
+    organization_id: orgAId, first_name: 'Aya', last_name: 'Koné', phone: '+2250701010103', email_verified_at: new Date(),
   });
   await db('users').insert({
     email: 'admin-b@test.com', password_hash: hash, role: 'wholesaler_admin',
-    organization_id: orgBId, first_name: 'Moussa', last_name: 'Diallo', phone: '+2250701010104',
+    organization_id: orgBId, first_name: 'Moussa', last_name: 'Diallo', phone: '+2250701010104', email_verified_at: new Date(),
   });
 
   const loginBuyer = await request(app).post('/api/auth/login').send({ email: 'buyer@test.com', password: 'TestPass123!' });

@@ -47,6 +47,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'A',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
 
   // Wholesaler admin B
@@ -58,6 +59,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'B',
     phone: '+2250701010102',
+    email_verified_at: new Date(),
   });
 
   // Buyer
@@ -69,6 +71,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'Test',
     phone: '+2250701010103',
+    email_verified_at: new Date(),
   });
 
   // Login all users

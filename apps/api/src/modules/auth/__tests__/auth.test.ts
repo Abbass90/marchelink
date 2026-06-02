@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { setupTestDb, teardownTestDb, cleanTables } from './setup.js';
+import { setupTestDb, teardownTestDb, cleanTables, getTestDb } from './setup.js';
 import { createTestApp } from './test-app.js';
 
 // Set test env vars before any app instantiation
@@ -83,6 +83,8 @@ describe('UC-08: Buyer registration and login', () => {
   describe('POST /api/auth/login', () => {
     beforeEach(async () => {
       await request(app).post('/api/auth/register').send(validBuyer);
+      // Mark email as verified (test env: no real email sent)
+      await getTestDb()('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
     });
 
     it('logs in and sets httpOnly cookies', async () => {
@@ -122,6 +124,7 @@ describe('UC-08: Buyer registration and login', () => {
   describe('POST /api/auth/refresh (token rotation)', () => {
     it('issues new tokens and revokes the old refresh token', async () => {
       await request(app).post('/api/auth/register').send(validBuyer);
+      await getTestDb()('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
       const loginRes = await request(app)
         .post('/api/auth/login')
         .send({ email: validBuyer.email, password: validBuyer.password });
@@ -150,6 +153,7 @@ describe('UC-08: Buyer registration and login', () => {
   describe('POST /api/auth/logout', () => {
     it('clears cookies and revokes refresh token', async () => {
       await request(app).post('/api/auth/register').send(validBuyer);
+      await getTestDb()('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
       const loginRes = await request(app)
         .post('/api/auth/login')
         .send({ email: validBuyer.email, password: validBuyer.password });
@@ -178,6 +182,7 @@ describe('GET /api/auth/me — session restore', () => {
 
   it('returns user profile when authenticated', async () => {
     await request(app).post('/api/auth/register').send(validBuyer);
+    await getTestDb()('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
     const loginRes = await request(app)
       .post('/api/auth/login')
       .send({ email: validBuyer.email, password: validBuyer.password });
@@ -230,6 +235,9 @@ describe('UC-21: Buyer cannot escalate to wholesaler role', () => {
 
   it('buyer cannot access admin-only routes (returns 404, not 403)', async () => {
     await request(app).post('/api/auth/register').send(validBuyer);
+    // Mark as verified (test env: no real email sent)
+    const db = getTestDb();
+    await db('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
     const loginRes = await request(app)
       .post('/api/auth/login')
       .send({ email: validBuyer.email, password: validBuyer.password });
@@ -283,6 +291,7 @@ describe('F1: Wholesaler registration', () => {
         .post('/api/auth/register-wholesaler')
         .send(validWholesaler);
 
+      await getTestDb()('users').where({ email: validWholesaler.email }).update({ email_verified_at: new Date() });
       const loginRes = await request(app)
         .post('/api/auth/login')
         .send({ email: validWholesaler.email, password: validWholesaler.password });
@@ -352,13 +361,17 @@ describe('F2: Profile Management', () => {
 
   /** Register the base user, login, return the access_token cookie string. */
   async function registerAndLogin(overrides?: Partial<typeof baseUser>): Promise<string> {
+    const email = overrides?.email ?? baseUser.email;
     await request(app)
       .post('/api/auth/register')
       .send({ ...baseUser, ...overrides });
 
+    // Mark as verified (test env: no real email sent)
+    await getTestDb()('users').where({ email }).update({ email_verified_at: new Date() });
+
     const loginRes = await request(app)
       .post('/api/auth/login')
-      .send({ email: overrides?.email ?? baseUser.email, password: overrides?.password ?? baseUser.password });
+      .send({ email, password: overrides?.password ?? baseUser.password });
 
     const cookies = loginRes.headers['set-cookie'] as string[];
     const accessCookie = cookies.find((c: string) => c.startsWith('access_token='))!;

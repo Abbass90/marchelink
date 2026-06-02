@@ -41,6 +41,7 @@ beforeEach(async () => {
     first_name: 'Admin',
     last_name: 'A',
     phone: '+2250701010101',
+    email_verified_at: new Date(),
   });
 
   await db('users').insert({
@@ -51,6 +52,7 @@ beforeEach(async () => {
     first_name: 'Buyer',
     last_name: 'Test',
     phone: '+2250701010102',
+    email_verified_at: new Date(),
   });
 
   const loginA = await request(app).post('/api/auth/login').send({ email: 'admin-a@test.com', password: 'TestPass123!' });

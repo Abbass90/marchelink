@@ -51,16 +51,16 @@ beforeEach(async () => {
 
   await db('users').insert({
     email: 'admin@test.com', password_hash: hash, role: 'wholesaler_admin',
-    organization_id: orgId, first_name: 'Admin', last_name: 'A', phone: '+2250701010101',
+    organization_id: orgId, first_name: 'Admin', last_name: 'A', phone: '+2250701010101', email_verified_at: new Date(),
   });
   const [buyerA] = await db('users').insert({
     email: 'buyer-a@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Buyer', last_name: 'A', phone: '+2250701010102',
+    organization_id: null, first_name: 'Buyer', last_name: 'A', phone: '+2250701010102', email_verified_at: new Date(),
   }).returning('id');
   buyerAId = buyerA!.id;
   const [buyerB] = await db('users').insert({
     email: 'buyer-b@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Buyer', last_name: 'B', phone: '+2250701010103',
+    organization_id: null, first_name: 'Buyer', last_name: 'B', phone: '+2250701010103', email_verified_at: new Date(),
   }).returning('id');
 
   // Commande appartenant à l'acheteur B (montant distinctif pour détecter une fuite).
