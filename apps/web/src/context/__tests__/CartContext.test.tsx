@@ -316,6 +316,7 @@ describe('CartContext — UC-11', () => {
         first_name: 'Test',
         last_name: 'User',
         phone: null,
+        profile_photo: null,
       };
     }
 

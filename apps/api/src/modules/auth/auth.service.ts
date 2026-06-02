@@ -192,6 +192,7 @@ export class AuthService {
     first_name: string;
     last_name: string;
     phone: string | null;
+    profile_photo: string | null;
   }> {
     const user = await this.repo.findById(userId);
     if (!user) {
@@ -206,6 +207,7 @@ export class AuthService {
       first_name: user.first_name,
       last_name: user.last_name,
       phone: user.phone,
+      profile_photo: user.profile_photo,
     };
   }
 

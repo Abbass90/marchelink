@@ -150,6 +150,7 @@ describe('Auth API functions', () => {
         first_name: 'Kouadio',
         last_name: 'Yao',
         phone: '+225070000000',
+        profile_photo: null,
       };
       mockFetch.mockReturnValueOnce(jsonResponse(200, profile));
 

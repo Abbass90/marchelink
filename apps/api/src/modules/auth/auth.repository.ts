@@ -39,7 +39,7 @@ export class AuthRepository {
 
   async findByEmail(email: string): Promise<UserRow | undefined> {
     return this.db('users')
-      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
+      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'profile_photo', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
       .where({ email })
       .whereNull('deleted_at')
       .first();
@@ -47,7 +47,7 @@ export class AuthRepository {
 
   async findById(id: string): Promise<UserRow | undefined> {
     return this.db('users')
-      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
+      .select('id', 'email', 'password_hash', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'profile_photo', 'email_verified_at', 'created_at', 'updated_at', 'deleted_at')
       .where({ id })
       .whereNull('deleted_at')
       .first();

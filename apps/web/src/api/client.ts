@@ -55,6 +55,7 @@ export interface UserProfile {
   first_name: string;
   last_name: string;
   phone: string | null;
+  profile_photo: string | null;
 }
 
 /* ── Auth API Functions ──────────────────────────────── */

@@ -21,8 +21,8 @@ export interface Founder {
 }
 
 export const FOUNDERS: readonly Founder[] = [
-  { name: 'Abbas Kanso', linkedin: 'https://www.linkedin.com/in/abbas-kanso' },
-  { name: 'Jaafar Seklawi', linkedin: 'https://www.linkedin.com/in/jaafar-seklawi' },
+  { name: 'Abbas Kanso', linkedin: 'https://www.linkedin.com/in/abbas-kanso-377453371' },
+  { name: 'Jaafar Seklawi', linkedin: 'https://www.linkedin.com/in/jaafar-seklawi-65b284384' },
 ] as const;
 
 /** Bloc contact — structure simple, facile à éditer. */

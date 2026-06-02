@@ -40,6 +40,7 @@ const fakeUser: UserProfile = {
   first_name: 'Kouadio',
   last_name: 'Yao',
   phone: '+225070000000',
+  profile_photo: null,
 };
 
 /* ── Test consumer component ─────────────────────────── */

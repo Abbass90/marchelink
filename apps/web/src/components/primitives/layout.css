@@ -191,6 +191,14 @@
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-wide);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.layout-profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-full);
 }
 
 .layout-profile-info {

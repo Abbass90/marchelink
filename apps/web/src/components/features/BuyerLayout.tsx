@@ -158,7 +158,17 @@ export default function BuyerLayout() {
         {/* Profile */}
         <div className="layout-profile">
           <div className="layout-profile-row">
-            <div className="layout-profile-avatar">{initials}</div>
+            <div className="layout-profile-avatar">
+              {user?.profile_photo ? (
+                <img
+                  src={user.profile_photo}
+                  alt={`${user.first_name} ${user.last_name}`}
+                  className="layout-profile-avatar-img"
+                />
+              ) : (
+                initials
+              )}
+            </div>
             <div className="layout-profile-info">
               <div className="layout-profile-name" data-testid="layout-user-name">
                 {user?.first_name} {user?.last_name}

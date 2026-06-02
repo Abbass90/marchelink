@@ -164,4 +164,59 @@ describe('CameraCapture', () => {
     });
     expect(screen.queryByTestId('camera-video')).not.toBeInTheDocument();
   });
+
+  it('offre le fallback fichier quand la caméra est rejetée', async () => {
+    (navigator.mediaDevices.getUserMedia as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      Object.assign(new Error('refused'), { name: 'NotAllowedError' }),
+    );
+
+    render(<CameraCapture onCapture={onCapture} onClear={onClear} />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByTestId('camera-start-btn'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('camera-file-btn')).toBeInTheDocument();
+    });
+  });
+
+  it('offre le fallback fichier si getUserMedia est indisponible', async () => {
+    // Simule un navigateur sans support caméra (ex: HTTP non sécurisé)
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: {},
+      writable: true,
+      configurable: true,
+    });
+
+    render(<CameraCapture onCapture={onCapture} onClear={onClear} />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByTestId('camera-start-btn'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('camera-file-btn')).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('camera-video')).not.toBeInTheDocument();
+  });
+
+  it('importe une image via le fallback fichier et appelle onCapture', async () => {
+    (navigator.mediaDevices.getUserMedia as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('NotAllowedError'),
+    );
+
+    render(<CameraCapture onCapture={onCapture} onClear={onClear} />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByTestId('camera-start-btn'));
+    await waitFor(() => screen.getByTestId('camera-file-input'));
+
+    const file = new File(['fake-bytes'], 'photo.jpg', { type: 'image/jpeg' });
+    await user.upload(screen.getByTestId('camera-file-input'), file);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('camera-preview')).toBeInTheDocument();
+    });
+    expect(onCapture).toHaveBeenCalledTimes(1);
+    expect((onCapture.mock.calls[0]?.[0] as string)).toMatch(/^data:/);
+  });
 });

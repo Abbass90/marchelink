@@ -61,6 +61,19 @@ services:
         sync: false
       - key: CORS_ALLOWED_ORIGINS
         sync: false
+      # ── Email Brevo SMTP (vérification email à l'inscription) ──
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
 
   # ── Web React (build statique Vite) ──────────────────────────────
   - type: web

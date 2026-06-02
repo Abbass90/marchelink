@@ -954,6 +954,35 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.30);
 }
 
+/* Partenaire SwiftGo */
+.l-footer-partner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.l-footer-partner-btn:hover {
+  color: var(--color-primary-fg);
+}
+
+.l-footer-partner-btn:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.30);
+}
+
+.l-footer-partner-desc {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.5;
+}
+
 /* Bottom bar */
 .l-footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.10);
