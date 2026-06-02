@@ -1,4 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import {
+  BarChart2, Package, FileText, CreditCard, MessageSquare, Settings2,
+} from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useChatUnread } from '../../hooks/useChatUnread.js';
 import { useState, useCallback } from 'react';
@@ -60,7 +63,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-dashboard"
           >
-            <span className="layout-nav-icon">📊</span>
+            <span className="layout-nav-icon"><BarChart2 size={18} /></span>
             <span className="layout-nav-label">Tableau de bord</span>
           </NavLink>
 
@@ -72,7 +75,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-products"
           >
-            <span className="layout-nav-icon">📦</span>
+            <span className="layout-nav-icon"><Package size={18} /></span>
             <span className="layout-nav-label">Gestion Catalogue</span>
           </NavLink>
 
@@ -84,7 +87,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-orders"
           >
-            <span className="layout-nav-icon">📑</span>
+            <span className="layout-nav-icon"><FileText size={18} /></span>
             <span className="layout-nav-label">Commandes Reçues</span>
           </NavLink>
 
@@ -96,7 +99,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-payments"
           >
-            <span className="layout-nav-icon">💳</span>
+            <span className="layout-nav-icon"><CreditCard size={18} /></span>
             <span className="layout-nav-label">Paiements</span>
           </NavLink>
 
@@ -108,7 +111,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-chat"
           >
-            <span className="layout-nav-icon">💬</span>
+            <span className="layout-nav-icon"><MessageSquare size={18} /></span>
             <span className="layout-nav-label">Messages</span>
             {chatUnread > 0 && (
               <span className="layout-nav-badge" data-testid="nav-chat-badge">
@@ -127,7 +130,7 @@ export default function WholesalerLayout() {
             onClick={closeSidebar}
             data-testid="nav-settings"
           >
-            <span className="layout-nav-icon">⚙️</span>
+            <span className="layout-nav-icon"><Settings2 size={18} /></span>
             <span className="layout-nav-label">Paramètres</span>
           </NavLink>
         </nav>

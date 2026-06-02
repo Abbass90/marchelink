@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { X, ImageIcon, Camera, Loader } from 'lucide-react';
 import { uploadProductImage, ApiError } from '../../api/client.js';
 
 interface Props {
@@ -47,11 +48,11 @@ export default function ProductImageUpload({ value, onChange }: Props) {
             aria-label="Supprimer l'image"
             data-testid="pm-image-remove"
           >
-            ✕
+            <X size={14} />
           </button>
         </div>
       ) : (
-        <div className="pm-image-placeholder" aria-hidden="true">🖼</div>
+        <div className="pm-image-placeholder" aria-hidden="true"><ImageIcon size={40} /></div>
       )}
 
       {/* Input caché — ouvert par le bouton */}
@@ -74,7 +75,10 @@ export default function ProductImageUpload({ value, onChange }: Props) {
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
       >
-        {uploading ? '⏳ Envoi en cours…' : '📷 Choisir une photo'}
+        {uploading
+          ? <><Loader size={16} className="pm-btn-icon" /> Envoi en cours…</>
+          : <><Camera size={16} className="pm-btn-icon" /> Choisir une photo</>
+        }
       </button>
 
       {uploadError && (

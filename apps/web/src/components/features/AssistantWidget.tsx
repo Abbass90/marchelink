@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Bot, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { sendAssistantMessage, type AssistantTurn } from '../../api/client.js';
 import '../primitives/assistant.css';
 
@@ -11,6 +13,8 @@ export default function AssistantWidget() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** §J — ID de la commande créée par passer_commande durant la session. */
+  const [lastOrderId, setLastOrderId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,10 +35,13 @@ export default function AssistantWidget() {
       setInput('');
       setSending(true);
       setError(null);
+      setLastOrderId(null); // §J — efface le CTA précédent à chaque nouveau message
 
       try {
-        const { reply } = await sendAssistantMessage(trimmed, history);
+        const { reply, order_id } = await sendAssistantMessage(trimmed, history);
         setMessages((m) => [...m, { role: 'assistant', content: reply }]);
+        // §J — Stocker l'ID de commande pour afficher le bouton CTA
+        if (order_id) setLastOrderId(order_id);
       } catch {
         setError("Désolé, l'assistant est momentanément indisponible. Réessayez.");
       } finally {
@@ -71,7 +78,7 @@ export default function AssistantWidget() {
         aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}
         data-testid="assistant-fab"
       >
-        {open ? '✕' : '🤖'}
+        {open ? <X size={20} /> : <Bot size={20} />}
       </button>
 
       {open && (
@@ -110,6 +117,19 @@ export default function AssistantWidget() {
                 <button className="assistant-retry" onClick={retry} data-testid="assistant-retry">
                   Réessayer
                 </button>
+              </div>
+            )}
+
+            {/* §J — CTA commande créée */}
+            {lastOrderId && (
+              <div className="assistant-order-cta" data-testid="assistant-order-cta-wrapper">
+                <Link
+                  to={`/buyer/order-confirmation/${lastOrderId}`}
+                  className="assistant-order-link"
+                  data-testid="assistant-order-cta"
+                >
+                  Voir ma commande →
+                </Link>
               </div>
             )}
           </div>

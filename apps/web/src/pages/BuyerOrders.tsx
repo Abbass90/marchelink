@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { fetchMyOrders, cancelOrder, ApiError } from '../api/client.js';
 import type { OrderResponse } from '../api/client.js';
 import '../components/primitives/catalog.css';
@@ -190,6 +191,13 @@ export default function BuyerOrders() {
 
               {/* ── Actions ─────────────────────────── */}
               <div className="bo-card-actions" onClick={e => e.stopPropagation()}>
+                <Link
+                  to={`/buyer/orders/${order.id}`}
+                  className="bo-action-btn bo-action-btn--detail"
+                  data-testid="bo-detail-link"
+                >
+                  Voir les détails
+                </Link>
                 {order.status === 'pending' && (
                   <>
                     <button

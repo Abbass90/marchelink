@@ -46,6 +46,7 @@ beforeEach(async () => {
     organization_id: orgAId,
     first_name: 'Admin',
     last_name: 'A',
+    phone: '+2250701010101',
   });
 
   // Wholesaler admin B
@@ -56,6 +57,7 @@ beforeEach(async () => {
     organization_id: orgBId,
     first_name: 'Admin',
     last_name: 'B',
+    phone: '+2250701010102',
   });
 
   // Buyer
@@ -66,6 +68,7 @@ beforeEach(async () => {
     organization_id: null,
     first_name: 'Buyer',
     last_name: 'Test',
+    phone: '+2250701010103',
   });
 
   // Login all users

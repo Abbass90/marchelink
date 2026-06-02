@@ -9,11 +9,13 @@ import WholesalerOrderDetail from '../WholesalerOrderDetail.js';
 const mockFetchOrgOrder = vi.fn();
 const mockUpdateOrderStatus = vi.fn();
 const mockFetchOrgOrderTimeline = vi.fn();
+const mockSetDeliveryMode = vi.fn();
 
 vi.mock('../../api/client.js', () => ({
   fetchOrgOrder: (...a: unknown[]) => mockFetchOrgOrder(...a),
   updateOrderStatus: (...a: unknown[]) => mockUpdateOrderStatus(...a),
   fetchOrgOrderTimeline: (...a: unknown[]) => mockFetchOrgOrderTimeline(...a),
+  setDeliveryMode: (...a: unknown[]) => mockSetDeliveryMode(...a),
   ApiError: class ApiError extends Error {
     status: number; code: string;
     constructor(status: number, code: string, message: string) {
@@ -26,7 +28,7 @@ vi.mock('../../api/client.js', () => ({
 
 const ORDER = {
   id: 'ord-abc-123', wholesaler_org_id: 'org-1', buyer_user_id: 'u-1',
-  status: 'pending', total_xof: '30000', payment_id: null,
+  status: 'pending', total_xof: '30000', payment_id: null, delivery_mode: null,
   created_at: '2025-05-15T09:00:00.000Z', updated_at: '2025-05-15T09:00:00.000Z',
   items: [
     { id: 'i1', order_id: 'ord-abc-123', product_id: 'p1', quantity: 2, unit_price_xof: '15000', line_total_xof: '30000' },
@@ -126,5 +128,52 @@ describe('WholesalerOrderDetail', () => {
   it('affiche le lien retour aux commandes', async () => {
     renderDetail();
     await waitFor(() => expect(screen.getByTestId('od-back-link')).toBeInTheDocument());
+  });
+
+  /* ── §5 Mode de livraison ─────────────────────────────── */
+
+  it('n\'affiche pas le sélecteur livraison pour commande pending', async () => {
+    renderDetail();
+    await waitFor(() => expect(screen.getByTestId('od-title')).toBeInTheDocument());
+    expect(screen.queryByTestId('delivery-mode-selector')).not.toBeInTheDocument();
+  });
+
+  it('affiche le sélecteur livraison pour commande accepted sans mode', async () => {
+    mockFetchOrgOrder.mockResolvedValue({ ...ORDER, status: 'accepted', delivery_mode: null });
+    renderDetail();
+    await waitFor(() => expect(screen.getByTestId('delivery-mode-selector')).toBeInTheDocument());
+    expect(screen.getByTestId('delivery-wholesaler-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('delivery-swiftgo-btn')).toBeInTheDocument();
+  });
+
+  it('appelle setDeliveryMode et met à jour l\'affichage au clic SwiftGo', async () => {
+    mockFetchOrgOrder.mockResolvedValue({ ...ORDER, status: 'accepted', delivery_mode: null });
+    mockSetDeliveryMode.mockResolvedValue({ ...ORDER, status: 'accepted', delivery_mode: 'swiftgo' });
+    renderDetail();
+    const user = userEvent.setup();
+
+    await waitFor(() => expect(screen.getByTestId('delivery-swiftgo-btn')).toBeInTheDocument());
+    await user.click(screen.getByTestId('delivery-swiftgo-btn'));
+
+    await waitFor(() => expect(mockSetDeliveryMode).toHaveBeenCalledWith('ord-abc-123', 'swiftgo'));
+    await waitFor(() => expect(screen.getByTestId('delivery-mode-display')).toBeInTheDocument());
+    expect(screen.getByTestId('swiftgo-link')).toBeInTheDocument();
+  });
+
+  it('affiche le bouton lien SwiftGo si delivery_mode est swiftgo', async () => {
+    mockFetchOrgOrder.mockResolvedValue({ ...ORDER, status: 'accepted', delivery_mode: 'swiftgo' });
+    renderDetail();
+
+    await waitFor(() => expect(screen.getByTestId('swiftgo-link')).toBeInTheDocument());
+    expect(screen.getByTestId('swiftgo-link')).toHaveAttribute('href', 'https://swiftgo.vip');
+    expect(screen.getByTestId('swiftgo-link')).toHaveAttribute('target', '_blank');
+  });
+
+  it('affiche "Livraison propre" si delivery_mode est wholesaler', async () => {
+    mockFetchOrgOrder.mockResolvedValue({ ...ORDER, status: 'accepted', delivery_mode: 'wholesaler' });
+    renderDetail();
+
+    await waitFor(() => expect(screen.getByTestId('delivery-mode-label')).toBeInTheDocument());
+    expect(screen.getByTestId('delivery-mode-label').textContent).toContain('Livraison propre');
   });
 });

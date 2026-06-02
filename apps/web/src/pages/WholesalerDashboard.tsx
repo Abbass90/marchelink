@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Banknote, Package, Clock, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.js';
 import {
   fetchDashboardStats,
@@ -117,7 +118,7 @@ export default function WholesalerDashboard() {
         {/* KPI Cards */}
         <section className="ws-kpi-grid" data-testid="ws-kpi-grid">
           <div className="ws-kpi-card" data-testid="ws-kpi-revenue">
-            <span className="ws-kpi-icon" aria-hidden="true">💰</span>
+            <span className="ws-kpi-icon" aria-hidden="true"><Banknote size={22} /></span>
             <span className="ws-kpi-value" data-testid="ws-revenue-value">
               {formatXOF(stats!.revenue_today_xof)}
             </span>
@@ -125,7 +126,7 @@ export default function WholesalerDashboard() {
           </div>
 
           <div className="ws-kpi-card" data-testid="ws-kpi-orders">
-            <span className="ws-kpi-icon" aria-hidden="true">📦</span>
+            <span className="ws-kpi-icon" aria-hidden="true"><Package size={22} /></span>
             <span className="ws-kpi-value" data-testid="ws-orders-value">
               {stats!.orders_today}
             </span>
@@ -133,7 +134,7 @@ export default function WholesalerDashboard() {
           </div>
 
           <div className="ws-kpi-card ws-kpi-card--alert" data-testid="ws-kpi-pending">
-            <span className="ws-kpi-icon" aria-hidden="true">⏳</span>
+            <span className="ws-kpi-icon" aria-hidden="true"><Clock size={22} /></span>
             <span className="ws-kpi-value" data-testid="ws-pending-value">
               {stats!.orders_pending}
             </span>
@@ -190,7 +191,7 @@ export default function WholesalerDashboard() {
                         disabled={saving}
                         onClick={handleCancelEdit}
                       >
-                        ✕
+                        <X size={14} />
                       </button>
                     </div>
                   ) : (

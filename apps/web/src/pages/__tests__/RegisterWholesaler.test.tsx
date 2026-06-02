@@ -63,7 +63,7 @@ describe('RegisterWholesaler Page', () => {
   it('renders cross-links to buyer registration and login', () => {
     renderPage();
 
-    expect(screen.getByText('Inscription acheteur')).toBeInTheDocument();
+    expect(screen.getByText('Inscription boutiquier')).toBeInTheDocument();
     expect(screen.getByText('Se connecter')).toBeInTheDocument();
   });
 
@@ -109,6 +109,7 @@ describe('RegisterWholesaler Page', () => {
     await user.type(screen.getByLabelText('Nom'), 'Koné');
     await user.type(screen.getByLabelText('Email'), 'aya@tissus.ci');
     await user.type(screen.getByLabelText('Mot de passe'), 'SecurePass1!');
+    await user.type(screen.getByLabelText(/Téléphone/), '0500000000');
     await user.click(screen.getByTestId('submit-btn'));
 
     await waitFor(() => {
@@ -121,7 +122,7 @@ describe('RegisterWholesaler Page', () => {
       last_name: 'Koné',
       email: 'aya@tissus.ci',
       password: 'SecurePass1!',
-      phone: '',
+      phone: '0500000000',
     });
   });
 
@@ -139,6 +140,7 @@ describe('RegisterWholesaler Page', () => {
     await user.type(screen.getByLabelText('Nom'), 'Koné');
     await user.type(screen.getByLabelText('Email'), 'dup@test.ci');
     await user.type(screen.getByLabelText('Mot de passe'), 'SecurePass1!');
+    await user.type(screen.getByLabelText(/Téléphone/), '0500000000');
     await user.click(screen.getByTestId('submit-btn'));
 
     await waitFor(() => {
@@ -161,6 +163,7 @@ describe('RegisterWholesaler Page', () => {
     await user.type(screen.getByLabelText('Nom'), 'Koné');
     await user.type(screen.getByLabelText('Email'), 'dup@test.ci');
     await user.type(screen.getByLabelText('Mot de passe'), 'SecurePass1!');
+    await user.type(screen.getByLabelText(/Téléphone/), '0500000000');
     await user.click(screen.getByTestId('submit-btn'));
 
     await waitFor(() => {

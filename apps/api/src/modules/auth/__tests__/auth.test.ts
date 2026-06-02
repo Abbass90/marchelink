@@ -43,6 +43,18 @@ describe('UC-08: Buyer registration and login', () => {
       );
     });
 
+    it('registers buyer with a profile photo (§8)', async () => {
+      const fakePhoto = 'data:image/jpeg;base64,/9j/fakeBase64==';
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ ...validBuyer, profile_photo: fakePhoto });
+
+      expect(res.status).toBe(201);
+      expect(res.body.id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      );
+    });
+
     it('rejects duplicate email', async () => {
       await request(app).post('/api/auth/register').send(validBuyer);
       const res = await request(app).post('/api/auth/register').send(validBuyer);
@@ -213,6 +225,7 @@ describe('UC-21: Buyer cannot escalate to wholesaler role', () => {
     password: 'SecurePass123!',
     first_name: 'Test',
     last_name: 'Buyer',
+    phone: '+2250700000000',
   };
 
   it('buyer cannot access admin-only routes (returns 404, not 403)', async () => {
@@ -367,7 +380,7 @@ describe('F2: Profile Management', () => {
       expect(res.body.last_name).toBe(baseUser.last_name); // unchanged
     });
 
-    it('allows clearing phone to null', async () => {
+    it('rejects setting phone to null (phone is NOT NULL since §9)', async () => {
       const token = await registerAndLogin();
 
       const res = await request(app)
@@ -375,8 +388,7 @@ describe('F2: Profile Management', () => {
         .set('Cookie', [`access_token=${token}`])
         .send({ phone: null });
 
-      expect(res.status).toBe(200);
-      expect(res.body.phone).toBeNull();
+      expect(res.status).toBe(422);
     });
 
     it('returns current profile unchanged when body is empty', async () => {

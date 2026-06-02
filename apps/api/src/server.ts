@@ -36,7 +36,8 @@ const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? '').split(',').filte
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use(cookieParser());
-app.use(express.json({ limit: '100kb' }));
+// Limite augmentée à 2 MB pour accepter les photos de profil base64 (§8).
+app.use(express.json({ limit: '2mb' }));
 app.use(correlationId());
 // Cast : `pino-http` embarque sa propre version des types `pino`, d'où un
 // léger décalage structurel avec notre instance `logger`. Le cast est sûr.

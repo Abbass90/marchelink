@@ -50,6 +50,7 @@ export class AuthService {
       first_name: input.first_name,
       last_name: input.last_name,
       ...(input.phone !== undefined ? { phone: input.phone } : {}),
+      ...(input.profile_photo !== undefined ? { profile_photo: input.profile_photo } : {}),
       organization_id: null,
     });
 

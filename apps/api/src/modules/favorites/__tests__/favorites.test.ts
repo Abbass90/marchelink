@@ -41,6 +41,7 @@ beforeEach(async () => {
     role: 'buyer',
     first_name: 'Kouadio',
     last_name: 'Test',
+    phone: '+2250701010101',
   });
 
   // Two products in the wholesaler's catalog
@@ -145,6 +146,7 @@ describe('UC-F1: acheteur gère ses favoris', () => {
         organization_id: (await getTestDb()('organizations').first())!.id,
         first_name: 'WS',
         last_name: 'Test',
+        phone: '+2250701010200',
       });
       const wsLogin = await request(app)
         .post('/api/auth/login')
@@ -189,6 +191,7 @@ describe('UC-F1: acheteur gère ses favoris', () => {
         role: 'buyer',
         first_name: 'Amani',
         last_name: 'Test',
+        phone: '+2250701010199',
       });
       const buyer2Login = await request(app)
         .post('/api/auth/login')

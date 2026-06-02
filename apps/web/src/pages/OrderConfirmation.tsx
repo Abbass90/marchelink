@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
+import { Clock, Check, CreditCard, Truck, CheckCircle2, Ban, XCircle } from 'lucide-react';
 import OrderTimeline from '../components/features/OrderTimeline.js';
 import { fetchOrderTimeline, fetchOrderForBuyer } from '../api/client.js';
 import type { OrderResponse } from '../api/client.js';
+import { SWIFTGO_URL } from '../config/site.js';
 import '../components/primitives/catalog.css';
 
 /* ── XOF formatter ───────────────────────────────────── */
@@ -14,7 +17,7 @@ function formatXOF(amount: string): string {
 /* ── Status configuration ────────────────────────────── */
 
 interface StatusConfig {
-  icon: string;
+  icon: ReactNode;
   title: string;
   subtitle: string;
   statusLabel: string;
@@ -24,7 +27,7 @@ interface StatusConfig {
 
 const STATUS_MAP: Record<string, StatusConfig> = {
   pending: {
-    icon: '⏳', // ⏳
+    icon: <Clock size={48} />,
     title: 'Commande enregistrée',
     subtitle: 'Votre commande a été transmise au grossiste. En attente de validation.',
     statusLabel: 'En attente de validation',
@@ -32,7 +35,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: false,
   },
   accepted: {
-    icon: '✓',
+    icon: <Check size={48} />,
     title: 'Commande acceptée',
     subtitle: 'Le grossiste a accepté votre commande. Vous pouvez procéder au paiement.',
     statusLabel: 'Acceptée — Prête à payer',
@@ -40,7 +43,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: true,
   },
   paid: {
-    icon: '💳', // 💳
+    icon: <CreditCard size={48} />,
     title: 'Paiement confirmé',
     subtitle: 'Votre paiement a été reçu. La commande est en préparation.',
     statusLabel: 'Payée — En préparation',
@@ -48,7 +51,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: false,
   },
   shipped: {
-    icon: '🚚', // 🚚
+    icon: <Truck size={48} />,
     title: 'Commande expédiée',
     subtitle: 'Votre commande est en cours de livraison.',
     statusLabel: 'En cours de livraison',
@@ -56,7 +59,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: false,
   },
   delivered: {
-    icon: '🎉', // 🎉
+    icon: <CheckCircle2 size={48} />,
     title: 'Commande livrée',
     subtitle: 'Votre commande a été livrée avec succès.',
     statusLabel: 'Livrée',
@@ -64,7 +67,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: false,
   },
   cancelled: {
-    icon: '🚫', // 🚫
+    icon: <Ban size={48} />,
     title: 'Commande annulée',
     subtitle: 'Cette commande a été annulée.',
     statusLabel: 'Annulée',
@@ -72,7 +75,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     showPayButton: false,
   },
   rejected: {
-    icon: '❌', // ❌
+    icon: <XCircle size={48} />,
     title: 'Commande refusée',
     subtitle: 'Le grossiste a refusé cette commande.',
     statusLabel: 'Refusée',
@@ -82,7 +85,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
 };
 
 const DEFAULT_CONFIG: StatusConfig = {
-  icon: '✓',
+  icon: <Check size={48} />,
   title: 'Commande enregistrée',
   subtitle: 'Votre commande a été transmise au grossiste.',
   statusLabel: 'En attente de validation',
@@ -206,6 +209,26 @@ export default function OrderConfirmation() {
                 {config.statusLabel}
               </span>
             </div>
+            {order?.delivery_mode && (
+              <div className="confirmation-row">
+                <span className="confirmation-label">Livraison</span>
+                {order.delivery_mode === 'swiftgo' ? (
+                  <a
+                    href={SWIFTGO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="confirmation-value confirmation-swiftgo-link"
+                    data-testid="confirmation-swiftgo-link"
+                  >
+                    SwiftGo ↗
+                  </a>
+                ) : (
+                  <span className="confirmation-value" data-testid="confirmation-delivery-mode">
+                    Livraison grossiste
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {orderId !== 'N/A' && (

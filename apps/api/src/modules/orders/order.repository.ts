@@ -7,6 +7,7 @@ export interface OrderRow {
   status: string;
   total_xof: string;
   payment_id: string | null;
+  delivery_mode: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -18,6 +19,17 @@ export interface OrderItemRow {
   quantity: number;
   unit_price_xof: string;
   line_total_xof: string;
+}
+
+/** Ligne de commande enrichie (JOIN products) — utilisée par l'endpoint de détail acheteur. */
+export interface EnrichedOrderItemRow extends OrderItemRow {
+  product_name: string;
+  product_unit: string;
+}
+
+/** Commande enrichie avec le nom du grossiste (JOIN organizations). */
+export interface EnrichedOrderRow extends OrderRow {
+  org_name: string;
 }
 
 export interface CreateOrderData {
@@ -38,7 +50,7 @@ export interface CreateOrderItemData {
 
 const ORDER_COLUMNS = [
   'id', 'wholesaler_org_id', 'buyer_user_id', 'status',
-  'total_xof', 'payment_id', 'created_at', 'updated_at',
+  'total_xof', 'payment_id', 'delivery_mode', 'created_at', 'updated_at',
 ];
 
 const ORDER_ITEM_COLUMNS = [
@@ -112,6 +124,45 @@ export class OrderRepository {
       .update({ status, updated_at: this.db.fn.now() })
       .returning(ORDER_COLUMNS);
     return row as OrderRow | undefined;
+  }
+
+  /** §5 — Grossiste fixe le mode de livraison. Filtre tenant obligatoire. */
+  async setDeliveryMode(orderId: string, mode: string, orgId: string): Promise<OrderRow | undefined> {
+    const [row] = await this.db('orders')
+      .where({ id: orderId, wholesaler_org_id: orgId, deleted_at: null })
+      .update({ delivery_mode: mode, updated_at: this.db.fn.now() })
+      .returning(ORDER_COLUMNS);
+    return row as OrderRow | undefined;
+  }
+
+  /**
+   * §11 — Détail acheteur enrichi : JOINs organizations pour avoir le nom du grossiste.
+   * Filtre tenant obligatoire : buyer_user_id = buyerUserId.
+   */
+  async findByIdForBuyerDetail(orderId: string, buyerUserId: string): Promise<EnrichedOrderRow | undefined> {
+    return this.db('orders as o')
+      .select([
+        ...ORDER_COLUMNS.map((c) => `o.${c}`),
+        'org.name as org_name',
+      ])
+      .leftJoin('organizations as org', 'o.wholesaler_org_id', 'org.id')
+      .where({ 'o.id': orderId, 'o.buyer_user_id': buyerUserId, 'o.deleted_at': null })
+      .first() as Promise<EnrichedOrderRow | undefined>;
+  }
+
+  /**
+   * §11 — Lignes enrichies : JOINs products pour avoir nom et unité.
+   * Pas de filtre tenant ici — le contrôle se fait au niveau commande.
+   */
+  async findItemsByOrderIdEnriched(orderId: string): Promise<EnrichedOrderItemRow[]> {
+    return this.db('order_items as oi')
+      .select([
+        ...ORDER_ITEM_COLUMNS.map((c) => `oi.${c}`),
+        'p.name as product_name',
+        'p.unit as product_unit',
+      ])
+      .leftJoin('products as p', 'oi.product_id', 'p.id')
+      .where({ 'oi.order_id': orderId, 'oi.deleted_at': null }) as Promise<EnrichedOrderItemRow[]>;
   }
 
   async decrementStock(productId: string, quantity: number, trx: Knex.Transaction): Promise<number> {

@@ -38,6 +38,8 @@ export interface RegisterPayload {
   first_name: string;
   last_name: string;
   phone?: string | undefined;
+  /** Data-URL base64 JPEG issu de la caméra — §8 */
+  profile_photo?: string | undefined;
 }
 
 export interface LoginPayload {
@@ -219,6 +221,18 @@ export interface OrderItemResponse {
   line_total_xof: string;
 }
 
+/** Ligne enrichie — endpoint §11 /my/:id/detail */
+export interface EnrichedOrderItemResponse extends OrderItemResponse {
+  product_name: string;
+  product_unit: string;
+}
+
+/** Commande enrichie — endpoint §11 /my/:id/detail */
+export interface OrderDetailResponse extends Omit<OrderResponse, 'items'> {
+  org_name: string;
+  items: EnrichedOrderItemResponse[];
+}
+
 export interface OrderResponse {
   id: string;
   wholesaler_org_id: string;
@@ -226,6 +240,8 @@ export interface OrderResponse {
   status: string;
   total_xof: string;
   payment_id: string | null;
+  /** §5 — Mode de livraison choisi par le grossiste : 'wholesaler' | 'swiftgo' | null */
+  delivery_mode: string | null;
   created_at: string;
   updated_at: string;
   items: OrderItemResponse[];
@@ -246,6 +262,11 @@ export function fetchMyOrders(): Promise<OrderResponse[]> {
 
 export function fetchOrderForBuyer(orderId: string): Promise<OrderResponse> {
   return apiFetch<OrderResponse>(`/orders/my/${orderId}`);
+}
+
+/** §11 — Détail enrichi : inclut org_name et product_name dans les lignes. */
+export function fetchOrderDetailForBuyer(orderId: string): Promise<OrderDetailResponse> {
+  return apiFetch<OrderDetailResponse>(`/orders/my/${orderId}/detail`);
 }
 
 export function cancelOrder(orderId: string): Promise<OrderResponse> {
@@ -271,6 +292,17 @@ export function updateOrderStatus(
   return apiFetch<OrderResponse>(`/orders/org/${orderId}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
+  });
+}
+
+/** §5 — Grossiste fixe le mode de livraison après acceptation. */
+export function setDeliveryMode(
+  orderId: string,
+  mode: 'wholesaler' | 'swiftgo',
+): Promise<OrderResponse> {
+  return apiFetch<OrderResponse>(`/orders/org/${orderId}/delivery-mode`, {
+    method: 'PATCH',
+    body: JSON.stringify({ delivery_mode: mode }),
   });
 }
 
@@ -622,11 +654,12 @@ export interface AssistantTurn {
 
 /* ── Assistant IA API Functions ─────────────────────────── */
 
+/** §J — order_id est présent quand passer_commande a créé une commande. */
 export function sendAssistantMessage(
   message: string,
   history: AssistantTurn[] = [],
-): Promise<{ reply: string }> {
-  return apiFetch<{ reply: string }>('/assistant/chat', {
+): Promise<{ reply: string; order_id?: string }> {
+  return apiFetch<{ reply: string; order_id?: string }>('/assistant/chat', {
     method: 'POST',
     body: JSON.stringify({ message, history }),
   });

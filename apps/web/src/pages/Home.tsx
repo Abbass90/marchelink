@@ -1,4 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  UtensilsCrossed, Scissors, Sparkles, Smartphone,
+  Package, ShoppingCart, Lock, Banknote, BarChart2,
+  Mail, MapPin,
+} from 'lucide-react';
+import Logo from '../components/primitives/Logo.js';
+import { FOUNDERS, CONTACT, FOOTER_NAV, BRAND_NAME } from '../config/site.js';
 import '../components/primitives/landing.css';
 
 /* ══════════════════════════════════════════════════════
@@ -9,53 +16,53 @@ import '../components/primitives/landing.css';
 /* ── Data ─────────────────────────────────────────────── */
 
 const CATEGORIES = [
-  { icon: '🥑', name: 'Alimentaire', count: '1 240+ produits' },
-  { icon: '🧵', name: 'Textile', count: '860+ produits' },
-  { icon: '✨', name: 'Beauté', count: '540+ produits' },
-  { icon: '📱', name: 'Électronique', count: '320+ produits' },
-] as const;
+  { icon: <UtensilsCrossed size={28} />, name: 'Alimentaire', count: '1 240+ produits' },
+  { icon: <Scissors size={28} />, name: 'Textile', count: '860+ produits' },
+  { icon: <Sparkles size={28} />, name: 'Beauté', count: '540+ produits' },
+  { icon: <Smartphone size={28} />, name: 'Électronique', count: '320+ produits' },
+];
 
 const STATS = [
-  { value: 2800, suffix: '+', label: 'Acheteurs actifs' },
+  { value: 2800, suffix: '+', label: 'Boutiquiers actifs' },
   { value: 150, suffix: '', label: 'Grossistes certifiés' },
   { value: 100, suffix: '%', label: 'Transactions sécurisées' },
 ] as const;
 
 const BENTO_FEATURES = [
   {
-    icon: '📦',
+    icon: <Package size={28} />,
     title: 'Validation de stock en temps réel',
     desc: 'Chaque commande vérifie et décrémente le stock dans une transaction atomique. Zéro survente possible.',
     wide: true,
   },
   {
-    icon: '🛒',
+    icon: <ShoppingCart size={28} />,
     title: 'Panier mono-grossiste',
     desc: 'Un panier par grossiste pour une logistique claire. Pas de mélanges, pas de confusion.',
     wide: false,
   },
   {
-    icon: '🔒',
+    icon: <Lock size={28} />,
     title: 'Isolation multi-tenant',
     desc: 'Chaque organisation est cloisonnée. Aucune fuite de données entre grossistes — les accès hors périmètre retournent 404.',
     wide: false,
   },
   {
-    icon: '💰',
+    icon: <Banknote size={28} />,
     title: 'Mobile Money sécurisé',
     desc: 'Webhooks idempotents avec clé unique par transaction. Un rejeu ne duplique jamais un paiement.',
     wide: true,
   },
   {
-    icon: '📊',
+    icon: <BarChart2 size={28} />,
     title: 'Tableau de bord intelligent',
     desc: 'Suivi des ventes, alertes de stock et analyses de performance en temps réel pour chaque grossiste.',
     wide: false,
   },
-] as const;
+];
 
 const STEPS = [
-  { num: '1', title: 'Inscrivez-vous', desc: 'Créez votre compte acheteur ou grossiste en quelques secondes.' },
+  { num: '1', title: 'Inscrivez-vous', desc: 'Créez votre compte boutiquier ou grossiste en quelques secondes.' },
   { num: '2', title: 'Parcourez', desc: 'Explorez les catalogues de tous les grossistes du marché.' },
   { num: '3', title: 'Commandez', desc: 'Ajoutez au panier, payez en Mobile Money et confirmez.' },
   { num: '4', title: 'Recevez', desc: 'Suivez votre livraison en temps réel jusqu\'a votre boutique.' },
@@ -159,6 +166,15 @@ function useCountUp(end: number, duration = 1800) {
 
 /* ── Sub-components ───────────────────────────────────── */
 
+/** LinkedIn "in" brand icon — inline SVG (not in lucide-react). */
+function LinkedInIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
+
 function ActivityChart() {
   return (
     <svg width="120" height="40" viewBox="0 0 120 40" fill="none" aria-hidden="true">
@@ -260,12 +276,16 @@ export default function Home() {
       {/* ── 1. Navbar ──────────────────────────────────── */}
       <nav className={`l-nav${navScrolled ? ' nav-glass' : ''}`} data-testid="navbar">
         <div className="l-nav-inner">
-          <div className="l-nav-brand">
-            Marché<span>Link</span>
-          </div>
+          <button
+            className="l-nav-brand"
+            onClick={() => handleNavigate('/')}
+            aria-label="MarchéLink — accueil"
+          >
+            <Logo tone="light" size="md" />
+          </button>
           <div className="l-nav-links">
             <button className="l-nav-link" onClick={() => handleNavigate('/buyer')}>
-              Acheteur
+              Boutiquier
             </button>
             <button className="l-nav-link" onClick={() => handleNavigate('/wholesaler')}>
               Grossiste
@@ -281,6 +301,9 @@ export default function Home() {
       <section className="l-hero" data-testid="hero-section">
         <div className="l-hero-grid">
           <div className="l-hero-left">
+            <div className="l-hero-logo">
+              <Logo size="lg" />
+            </div>
             <span className="l-hero-badge">
               <span className="l-hero-badge-dot" />
               Le marché d&apos;Adjamé dans votre poche
@@ -431,9 +454,77 @@ export default function Home() {
 
       {/* ── Footer ─────────────────────────────────────── */}
       <footer className="l-footer" data-testid="footer">
-        <p className="l-footer-text">
-          MarchéLink — Abidjan, Côte d&apos;Ivoire &middot; {new Date().getFullYear()}
-        </p>
+        <div className="l-footer-inner">
+
+          {/* Brand block */}
+          <div className="l-footer-brand-block">
+            <Logo tone="light" size="md" />
+            <p className="l-footer-tagline">
+              Connecter les grossistes d&apos;Adjamé aux boutiquiers d&apos;Abidjan.
+            </p>
+          </div>
+
+          {/* Navigation block */}
+          <div className="l-footer-block">
+            <h3 className="l-footer-block-title">Navigation</h3>
+            <ul className="l-footer-nav-list">
+              {FOOTER_NAV.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} className="l-footer-nav-link">{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact block */}
+          <div className="l-footer-block">
+            <h3 className="l-footer-block-title">Contact</h3>
+            <div className="l-footer-contact">
+              <div className="l-footer-contact-item">
+                <Mail size={14} />
+                <a
+                  href={`mailto:${CONTACT.email}`}
+                  className="l-footer-contact-link"
+                  data-testid="footer-email"
+                >
+                  {CONTACT.email}
+                </a>
+              </div>
+              <div className="l-footer-contact-item">
+                <MapPin size={14} />
+                <span>{CONTACT.location}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Founders block */}
+          <div className="l-footer-block">
+            <h3 className="l-footer-block-title">Fondateurs</h3>
+            <div className="l-footer-founders">
+              {FOUNDERS.map((founder) => (
+                <a
+                  key={founder.name}
+                  href={founder.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="l-footer-linkedin-btn"
+                  aria-label={`Profil LinkedIn de ${founder.name}`}
+                  data-testid="founder-linkedin"
+                >
+                  <LinkedInIcon size={14} />
+                  <span>{founder.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="l-footer-bottom">
+          <p className="l-footer-bottom-text">
+            © {new Date().getFullYear()} {BRAND_NAME} &middot; Tous droits réservés
+          </p>
+        </div>
       </footer>
     </div>
   );

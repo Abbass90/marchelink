@@ -9,6 +9,7 @@ export interface UserRow {
   phone: string | null;
   first_name: string;
   last_name: string;
+  profile_photo: string | null;
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;
@@ -50,6 +51,7 @@ export class AuthRepository {
     last_name: string;
     phone?: string;
     organization_id?: string | null;
+    profile_photo?: string;
   }): Promise<UserRow> {
     const [user] = await this.db('users')
       .insert({
@@ -60,8 +62,9 @@ export class AuthRepository {
         last_name: data.last_name,
         phone: data.phone ?? null,
         organization_id: data.organization_id ?? null,
+        profile_photo: data.profile_photo ?? null,
       })
-      .returning(['id', 'email', 'role', 'organization_id', 'phone', 'first_name', 'last_name', 'created_at', 'updated_at', 'deleted_at']);
+      .returning(['id', 'email', 'role', 'organization_id', 'phone', 'profile_photo', 'first_name', 'last_name', 'created_at', 'updated_at', 'deleted_at']);
     return user as UserRow;
   }
 

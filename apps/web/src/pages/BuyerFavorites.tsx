@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { getFavorites, removeFavorite, ApiError } from '../api/client.js';
 import type { FavoriteItem } from '../api/client.js';
 import { useCart, type CartConflict } from '../context/CartContext.js';
@@ -169,7 +170,7 @@ export default function BuyerFavorites() {
                     onClick={() => handleAddToCart(item)}
                     data-testid="fav-add-to-cart"
                   >
-                    🛒 Ajouter au panier
+                    <ShoppingCart size={15} /> Ajouter au panier
                   </button>
                   <button
                     className="fav-remove-btn"
@@ -178,7 +179,7 @@ export default function BuyerFavorites() {
                     data-testid="fav-remove"
                     aria-label="Retirer des favoris"
                   >
-                    ♥
+                    <Heart size={18} fill="currentColor" />
                   </button>
                 </div>
               </div>

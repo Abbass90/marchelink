@@ -47,6 +47,7 @@ beforeEach(async () => {
     organization_id: orgAId,
     first_name: 'Admin',
     last_name: 'A',
+    phone: '+2250701010101',
   });
 
   await db('users').insert({
@@ -56,6 +57,7 @@ beforeEach(async () => {
     organization_id: orgBId,
     first_name: 'Admin',
     last_name: 'B',
+    phone: '+2250701010102',
   });
 
   await db('users').insert({
@@ -65,6 +67,7 @@ beforeEach(async () => {
     organization_id: null,
     first_name: 'Buyer',
     last_name: 'A',
+    phone: '+2250701010103',
   });
 
   await db('users').insert({
@@ -74,6 +77,7 @@ beforeEach(async () => {
     organization_id: null,
     first_name: 'Buyer',
     last_name: 'B',
+    phone: '+2250701010104',
   });
 
   // Login users
@@ -397,5 +401,138 @@ describe('UC-15: buyer cannot see or modify another buyer order', () => {
       .set('Cookie', [buyerACookie]);
 
     expect(res.status).toBe(422);
+  });
+});
+
+describe('§5 — delivery mode (PATCH /api/orders/org/:id/delivery-mode)', () => {
+  async function createAcceptedOrder(): Promise<string> {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    await request(app)
+      .patch(`/api/orders/org/${orderRes.body.id}/status`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ status: 'accepted' });
+    return orderRes.body.id as string;
+  }
+
+  it('wholesaler sets delivery_mode to wholesaler on accepted order', async () => {
+    const orderId = await createAcceptedOrder();
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/delivery-mode`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ delivery_mode: 'wholesaler' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.delivery_mode).toBe('wholesaler');
+  });
+
+  it('wholesaler sets delivery_mode to swiftgo on accepted order', async () => {
+    const orderId = await createAcceptedOrder();
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/delivery-mode`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ delivery_mode: 'swiftgo' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.delivery_mode).toBe('swiftgo');
+  });
+
+  it('rejects invalid delivery_mode value (422)', async () => {
+    const orderId = await createAcceptedOrder();
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/delivery-mode`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ delivery_mode: 'carrier_pigeon' });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('rejects setting delivery_mode on a pending order (422)', async () => {
+    const orderRes = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderRes.body.id}/delivery-mode`)
+      .set('Cookie', [wholesalerACookie])
+      .send({ delivery_mode: 'swiftgo' });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('wholesaler B cannot set delivery_mode on wholesaler A order (404)', async () => {
+    const orderId = await createAcceptedOrder();
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/delivery-mode`)
+      .set('Cookie', [wholesalerBCookie])
+      .send({ delivery_mode: 'swiftgo' });
+
+    expect(res.status).toBe(404);
+  });
+
+  it('buyer cannot set delivery_mode (404 per §14 anti-info-leak)', async () => {
+    const orderId = await createAcceptedOrder();
+
+    const res = await request(app)
+      .patch(`/api/orders/org/${orderId}/delivery-mode`)
+      .set('Cookie', [buyerACookie])
+      .send({ delivery_mode: 'swiftgo' });
+
+    // §14 — requireRole retourne 404 pour masquer l'existence de la ressource.
+    expect(res.status).toBe(404);
+  });
+});
+
+/* ── §11 — GET /my/:id/detail (buyer order detail enrichi) ───────────────────────── */
+
+describe('§11 — buyer order detail enriched', () => {
+  async function createPendingOrderForBuyerA(): Promise<string> {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerACookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    return res.body.id as string;
+  }
+
+  it('returns 200 with org_name and product_name in items', async () => {
+    const orderId = await createPendingOrderForBuyerA();
+
+    const res = await request(app)
+      .get(`/api/orders/my/${orderId}/detail`)
+      .set('Cookie', [buyerACookie]);
+
+    expect(res.status).toBe(200);
+    expect(res.body.org_name).toBe('Org A');
+    expect(Array.isArray(res.body.items)).toBe(true);
+    expect(res.body.items[0].product_name).toBe('Tissu Wax');
+    expect(res.body.items[0].product_unit).toBe('piece');
+  });
+
+  it('returns 404 when buyer A tries to access buyer B order (cross-tenant)', async () => {
+    // Buyer B places an order
+    const resB = await request(app)
+      .post('/api/orders')
+      .set('Cookie', [buyerBCookie])
+      .send({ wholesaler_org_id: orgAId, items: [{ product_id: productAId, quantity: 1 }] });
+    const orderBId = resB.body.id as string;
+
+    // Buyer A tries to access it
+    const res = await request(app)
+      .get(`/api/orders/my/${orderBId}/detail`)
+      .set('Cookie', [buyerACookie]);
+
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 401 for unauthenticated request', async () => {
+    const res = await request(app).get('/api/orders/my/some-id/detail');
+    expect(res.status).toBe(401);
   });
 });

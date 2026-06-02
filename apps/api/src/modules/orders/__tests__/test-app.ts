@@ -11,6 +11,7 @@ import { AuthRepository } from '../../auth/auth.repository.js';
 import { OrderController } from '../order.controller.js';
 import { OrderService } from '../order.service.js';
 import { OrderRepository } from '../order.repository.js';
+import { OrderEventRepository } from '../order-event.repository.js';
 import { ProductController } from '../../products/product.controller.js';
 import { ProductService } from '../../products/product.service.js';
 import { ProductRepository } from '../../products/product.repository.js';
@@ -28,7 +29,8 @@ export function createOrderTestApp() {
   const productController = new ProductController(productService);
 
   const orderRepo = new OrderRepository(db);
-  const orderService = new OrderService(orderRepo, db);
+  const eventRepo = new OrderEventRepository(db);
+  const orderService = new OrderService(orderRepo, db, eventRepo);
   const orderController = new OrderController(orderService);
 
   const app = express();
@@ -52,10 +54,12 @@ export function createOrderTestApp() {
   orderRouter.post('/', requireAuth, requireRole('buyer'), orderController.placeOrder);
   orderRouter.get('/my', requireAuth, requireRole('buyer'), orderController.listByBuyer);
   orderRouter.get('/my/:id', requireAuth, requireRole('buyer'), orderController.getByIdForBuyer);
+  orderRouter.get('/my/:id/detail', requireAuth, requireRole('buyer'), orderController.getOrderDetailForBuyer);
   orderRouter.patch('/my/:id/cancel', requireAuth, requireRole('buyer'), orderController.cancelOrder);
   orderRouter.get('/org', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.listByOrg);
   orderRouter.get('/org/:id', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.getByIdForWholesaler);
   orderRouter.patch('/org/:id/status', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.updateStatus);
+  orderRouter.patch('/org/:id/delivery-mode', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.setDeliveryMode);
   app.use('/api/orders', orderRouter);
 
   app.use(errorHandler);

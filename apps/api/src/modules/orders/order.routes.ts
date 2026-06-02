@@ -18,6 +18,7 @@ export const ordersRouter = Router();
 ordersRouter.post('/', requireAuth, requireRole('buyer'), orderController.placeOrder);
 ordersRouter.get('/my', requireAuth, requireRole('buyer'), orderController.listByBuyer);
 ordersRouter.get('/my/:id', requireAuth, requireRole('buyer'), orderController.getByIdForBuyer);
+ordersRouter.get('/my/:id/detail', requireAuth, requireRole('buyer'), orderController.getOrderDetailForBuyer);
 ordersRouter.get('/my/:id/timeline', requireAuth, requireRole('buyer'), orderController.getTimelineForBuyer);
 ordersRouter.patch('/my/:id/cancel', requireAuth, requireRole('buyer'), orderController.cancelOrder);
 
@@ -26,3 +27,4 @@ ordersRouter.get('/org', requireAuth, requireRole('wholesaler_admin', 'wholesale
 ordersRouter.get('/org/:id', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.getByIdForWholesaler);
 ordersRouter.get('/org/:id/timeline', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.getTimelineForWholesaler);
 ordersRouter.patch('/org/:id/status', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.updateStatus);
+ordersRouter.patch('/org/:id/delivery-mode', requireAuth, requireRole('wholesaler_admin', 'wholesaler_seller'), orderController.setDeliveryMode);

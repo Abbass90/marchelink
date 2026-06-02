@@ -263,7 +263,7 @@ describe('ProductManager — UC-01, UC-02', () => {
     fireEvent.click(screen.getByTestId('pm-add-btn'));
     // Le composant ProductImageUpload remplace le champ URL texte
     expect(screen.getByTestId('pm-image-upload-btn')).toBeInTheDocument();
-    expect(screen.getByTestId('pm-image-upload-btn').textContent).toBe('📷 Choisir une photo');
+    expect(screen.getByTestId('pm-image-upload-btn').textContent).toContain('Choisir une photo');
   });
 
   /* Form Submit — Create ─────────────────────────────── */

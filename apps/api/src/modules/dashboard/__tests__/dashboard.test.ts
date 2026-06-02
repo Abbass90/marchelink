@@ -40,6 +40,7 @@ beforeEach(async () => {
     organization_id: orgAId,
     first_name: 'Admin',
     last_name: 'A',
+    phone: '+2250701010101',
   });
 
   await db('users').insert({
@@ -49,6 +50,7 @@ beforeEach(async () => {
     organization_id: null,
     first_name: 'Buyer',
     last_name: 'Test',
+    phone: '+2250701010102',
   });
 
   const loginA = await request(app).post('/api/auth/login').send({ email: 'admin-a@test.com', password: 'TestPass123!' });

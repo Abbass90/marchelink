@@ -4,9 +4,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth.js';
 import { ApiError } from '../api/client.js';
+import CameraCapture from '../components/features/CameraCapture.js';
 import '../components/primitives/auth.css';
 
 /* ── Zod Schema (mirrors backend RegisterBuyerSchema) ── */
+
+/** Validation format numéro ivoirien — normalisation côté backend. */
+const ciPhoneSchema = z
+  .string()
+  .min(1, 'Le numéro est requis')
+  .refine((val) => {
+    const s = val.replace(/[\s\-\.\(\)]/g, '');
+    return /^(\+225|00225)?\d{10}$/.test(s);
+  }, 'Numéro ivoirien invalide — ex : 07 00 00 00 00 ou +225 07 00 00 00 00');
 
 const RegisterFormSchema = z.object({
   first_name: z.string().min(1, 'Le prénom est requis').max(100),
@@ -16,7 +26,7 @@ const RegisterFormSchema = z.object({
     .string()
     .min(8, 'Minimum 8 caractères')
     .max(128),
-  phone: z.string().max(20).optional(),
+  phone: ciPhoneSchema,
 });
 
 type FormFields = z.infer<typeof RegisterFormSchema>;
@@ -49,6 +59,8 @@ export default function Register() {
     phone: '',
   });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -79,7 +91,6 @@ export default function Register() {
   const handleBlur = useCallback(
     (e: FocusEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      if (name === 'phone' && value === '') return; // phone is optional
       validateField(name as keyof FormFields, value);
     },
     [validateField],
@@ -102,9 +113,16 @@ export default function Register() {
         return;
       }
 
+      /* Photo obligatoire — §8 */
+      if (!profilePhoto) {
+        setPhotoError('La photo de profil est requise');
+        return;
+      }
+      setPhotoError(null);
+
       setSubmitting(true);
       try {
-        await register(parsed.data);
+        await register({ ...parsed.data, profile_photo: profilePhoto });
         // useAuth sets user → triggers re-render → redirect above
       } catch (err) {
         const message =
@@ -114,7 +132,7 @@ export default function Register() {
         setSubmitting(false);
       }
     },
-    [fields, register],
+    [fields, profilePhoto, register],
   );
 
   return (
@@ -225,7 +243,7 @@ export default function Register() {
 
           <div className="auth-field">
             <label className="auth-label" htmlFor="reg-phone">
-              Téléphone <span className="auth-label-opt">(optionnel)</span>
+              Téléphone
             </label>
             <input
               id="reg-phone"
@@ -241,6 +259,21 @@ export default function Register() {
             />
             <span className="auth-field-error" data-testid="error-phone">
               {fieldErrors.phone ?? ''}
+            </span>
+          </div>
+
+          {/* §8 — Photo de profil obligatoire (caméra uniquement) */}
+          <div className="auth-field">
+            <label className="auth-label">Photo de profil</label>
+            <CameraCapture
+              onCapture={(dataUrl) => {
+                setProfilePhoto(dataUrl);
+                setPhotoError(null);
+              }}
+              onClear={() => setProfilePhoto(null)}
+            />
+            <span className="auth-field-error" data-testid="error-photo">
+              {photoError ?? ''}
             </span>
           </div>
 

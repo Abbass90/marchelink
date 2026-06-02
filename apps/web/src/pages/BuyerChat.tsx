@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { MessageCircle } from 'lucide-react';
 import {
   listChatOrgs, listConversations, createConversation,
   getMessages, sendChatMessage, markConversationRead, authMe,
@@ -148,7 +149,7 @@ export default function BuyerChat() {
             </>
           ) : (
             <div className="chat-no-conv" data-testid="chat-no-selection">
-              <div className="chat-no-conv-icon">💬</div>
+              <div className="chat-no-conv-icon"><MessageCircle size={40} /></div>
               <p>Sélectionnez une conversation</p>
             </div>
           )}

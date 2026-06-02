@@ -28,7 +28,7 @@ const ROLE_LABELS: Record<string, string> = {
   platform_admin: 'Admin',
   wholesaler_admin: 'Grossiste',
   wholesaler_seller: 'Vendeur',
-  buyer: 'Acheteur',
+  buyer: 'Boutiquier',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Acheteur</th>
+                    <th>Boutiquier</th>
                     <th>Grossiste</th>
                     <th>Montant</th>
                     <th>Statut</th>

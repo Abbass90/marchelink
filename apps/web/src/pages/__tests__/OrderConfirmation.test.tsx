@@ -23,6 +23,7 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
     status: 'pending',
     total_xof: '42500',
     payment_id: null,
+    delivery_mode: null,
     created_at: '2026-05-30T10:00:00Z',
     updated_at: '2026-05-30T10:00:00Z',
     items: [],
@@ -257,6 +258,38 @@ describe('OrderConfirmation — UC-12', () => {
         'Commande annulée',
       );
     });
+  });
+
+  /* ── §5 Mode de livraison ──────────────────────────── */
+
+  it('n\'affiche pas de badge livraison quand delivery_mode est null', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(makeOrder({ status: 'accepted', delivery_mode: null }));
+    renderConfirmation('abcd1234-5678-9012-3456', { orderId: 'abcd1234-5678-9012-3456' });
+
+    await waitFor(() => expect(screen.getByTestId('confirmation-title')).toBeInTheDocument());
+    expect(screen.queryByTestId('confirmation-swiftgo-link')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('confirmation-delivery-mode')).not.toBeInTheDocument();
+  });
+
+  it('affiche le lien SwiftGo quand delivery_mode est swiftgo', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(
+      makeOrder({ status: 'shipped', delivery_mode: 'swiftgo' }),
+    );
+    renderConfirmation('abcd1234-5678-9012-3456', { orderId: 'abcd1234-5678-9012-3456' });
+
+    await waitFor(() => expect(screen.getByTestId('confirmation-swiftgo-link')).toBeInTheDocument());
+    expect(screen.getByTestId('confirmation-swiftgo-link')).toHaveAttribute('href', 'https://swiftgo.vip');
+    expect(screen.getByTestId('confirmation-swiftgo-link')).toHaveAttribute('target', '_blank');
+  });
+
+  it('affiche "Livraison grossiste" quand delivery_mode est wholesaler', async () => {
+    mockFetchOrderForBuyer.mockResolvedValue(
+      makeOrder({ status: 'shipped', delivery_mode: 'wholesaler' }),
+    );
+    renderConfirmation('abcd1234-5678-9012-3456', { orderId: 'abcd1234-5678-9012-3456' });
+
+    await waitFor(() => expect(screen.getByTestId('confirmation-delivery-mode')).toBeInTheDocument());
+    expect(screen.getByTestId('confirmation-delivery-mode').textContent).toContain('grossiste');
   });
 
   /* ── Fallback ──────────────────────────────────────── */

@@ -1,4 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import {
+  ShoppingBag, Star, ClipboardList, CreditCard, MessageSquare,
+  ShoppingCart, Settings2,
+} from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useCart } from '../../context/CartContext.js';
 import { useChatUnread } from '../../hooks/useChatUnread.js';
@@ -49,7 +53,7 @@ export default function BuyerLayout() {
         {/* Brand */}
         <div className="layout-brand">
           <div className="layout-brand-name">MarchéLink</div>
-          <div className="layout-brand-role">Espace Acheteur</div>
+          <div className="layout-brand-role">Espace Boutiquier</div>
         </div>
 
         {/* Nav */}
@@ -62,7 +66,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-catalog"
           >
-            <span className="layout-nav-icon">🛍️</span>
+            <span className="layout-nav-icon"><ShoppingBag size={18} /></span>
             <span className="layout-nav-label">Catalogue</span>
           </NavLink>
 
@@ -74,7 +78,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-favorites"
           >
-            <span className="layout-nav-icon">⭐</span>
+            <span className="layout-nav-icon"><Star size={18} /></span>
             <span className="layout-nav-label">Mes Favoris</span>
           </NavLink>
 
@@ -86,7 +90,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-orders"
           >
-            <span className="layout-nav-icon">📋</span>
+            <span className="layout-nav-icon"><ClipboardList size={18} /></span>
             <span className="layout-nav-label">Mes Commandes</span>
           </NavLink>
 
@@ -98,7 +102,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-payments"
           >
-            <span className="layout-nav-icon">💳</span>
+            <span className="layout-nav-icon"><CreditCard size={18} /></span>
             <span className="layout-nav-label">Paiements</span>
           </NavLink>
 
@@ -110,7 +114,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-chat"
           >
-            <span className="layout-nav-icon">💬</span>
+            <span className="layout-nav-icon"><MessageSquare size={18} /></span>
             <span className="layout-nav-label">Messages</span>
             {chatUnread > 0 && (
               <span className="layout-nav-badge" data-testid="nav-chat-badge">
@@ -127,7 +131,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-cart"
           >
-            <span className="layout-nav-icon">🛒</span>
+            <span className="layout-nav-icon"><ShoppingCart size={18} /></span>
             <span className="layout-nav-label">Mon Panier</span>
             {itemCount > 0 && (
               <span className="layout-nav-badge" data-testid="nav-cart-badge">
@@ -146,7 +150,7 @@ export default function BuyerLayout() {
             onClick={closeSidebar}
             data-testid="nav-settings"
           >
-            <span className="layout-nav-icon">⚙️</span>
+            <span className="layout-nav-icon"><Settings2 size={18} /></span>
             <span className="layout-nav-label">Paramètres</span>
           </NavLink>
         </nav>

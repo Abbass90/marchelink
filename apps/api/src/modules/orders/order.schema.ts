@@ -16,5 +16,13 @@ export const UpdateOrderStatusSchema = z.object({
   status: z.enum(['accepted', 'rejected', 'shipped', 'delivered']),
 });
 
+/** §5 — Mode de livraison choisi par le grossiste après acceptation. */
+export const SetDeliveryModeSchema = z.object({
+  delivery_mode: z.enum(['wholesaler', 'swiftgo'], {
+    errorMap: () => ({ message: "Mode invalide — valeurs acceptées : 'wholesaler', 'swiftgo'" }),
+  }),
+});
+
 export type PlaceOrderDto = z.infer<typeof PlaceOrderSchema>;
 export type UpdateOrderStatusDto = z.infer<typeof UpdateOrderStatusSchema>;
+export type SetDeliveryModeDto = z.infer<typeof SetDeliveryModeSchema>;

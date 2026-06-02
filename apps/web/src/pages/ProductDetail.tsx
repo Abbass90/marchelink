@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { fetchProduct, getFavorites, addFavorite, removeFavorite, ApiError } from '../api/client.js';
 import type { BrowseProduct } from '../api/client.js';
 import { useCart, type CartConflict } from '../context/CartContext.js';
@@ -178,7 +179,7 @@ export default function ProductDetail() {
                 aria-label={isFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                 data-testid="fav-toggle"
               >
-                {isFavorited ? '♥' : '♡'}
+                <Heart size={18} fill={isFavorited ? 'currentColor' : 'none'} />
               </button>
             </div>
             <p className="detail-org" data-testid="detail-org">

@@ -1,17 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { ReactNode } from 'react';
+import { Clock, CheckCircle, XCircle, Ban, CreditCard, Truck, CheckCircle2, Check } from 'lucide-react';
 import type { OrderEvent } from '../../api/client.js';
 import '../primitives/timeline.css';
 
 /* ── Status config ───────────────────────────────────────── */
 
-const STATUS_META: Record<string, { label: string; icon: string; dotClass: string }> = {
-  pending:   { label: 'Commande reçue',        icon: '⏳', dotClass: 'tl-dot--done' },
-  accepted:  { label: 'Acceptée par grossiste', icon: '✅', dotClass: 'tl-dot--done' },
-  rejected:  { label: 'Refusée',               icon: '❌', dotClass: 'tl-dot--danger' },
-  cancelled: { label: 'Annulée',               icon: '🚫', dotClass: 'tl-dot--danger' },
-  paid:      { label: 'Paiement confirmé',      icon: '💳', dotClass: 'tl-dot--done' },
-  shipped:   { label: 'En cours de livraison',  icon: '🚚', dotClass: 'tl-dot--active' },
-  delivered: { label: 'Livrée',                icon: '🎉', dotClass: 'tl-dot--success' },
+const STATUS_META: Record<string, { label: string; icon: ReactNode; dotClass: string }> = {
+  pending:   { label: 'Commande reçue',        icon: <Clock size={14} />,         dotClass: 'tl-dot--done' },
+  accepted:  { label: 'Acceptée par grossiste', icon: <CheckCircle size={14} />,  dotClass: 'tl-dot--done' },
+  rejected:  { label: 'Refusée',               icon: <XCircle size={14} />,       dotClass: 'tl-dot--danger' },
+  cancelled: { label: 'Annulée',               icon: <Ban size={14} />,           dotClass: 'tl-dot--danger' },
+  paid:      { label: 'Paiement confirmé',      icon: <CreditCard size={14} />,   dotClass: 'tl-dot--done' },
+  shipped:   { label: 'En cours de livraison',  icon: <Truck size={14} />,        dotClass: 'tl-dot--active' },
+  delivered: { label: 'Livrée',                icon: <CheckCircle2 size={14} />,  dotClass: 'tl-dot--success' },
 };
 
 function dotClass(status: string, isLast: boolean): string {
@@ -87,7 +89,7 @@ export default function OrderTimeline({ orderId, fetchFn }: Props) {
             return (
               <li key={ev.id} className="tl-item" data-testid={`tl-item-${ev.status}`}>
                 <span className={dotClass(ev.status, isLast)} aria-hidden="true">
-                  {isLast ? (meta?.icon ?? '●') : '✓'}
+                  {isLast ? (meta?.icon ?? <Check size={14} />) : <Check size={14} />}
                 </span>
                 <div className="tl-content">
                   <span className="tl-status-label">{meta?.label ?? ev.status}</span>

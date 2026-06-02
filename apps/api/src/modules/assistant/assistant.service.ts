@@ -142,7 +142,7 @@ export class AssistantService {
     history: AssistantTurn[],
     buyerUserId: string,
     correlationId?: string,
-  ): Promise<{ reply: string }> {
+  ): Promise<{ reply: string; order_id?: string }> {
     const check = detectPromptInjection(message);
     if (check.flagged) {
       logInjectionAttempt({ userId: buyerUserId, correlationId, pattern: check.pattern });
@@ -153,6 +153,9 @@ export class AssistantService {
       ...history.map((h): Anthropic.MessageParam => ({ role: h.role, content: h.content })),
       { role: 'user', content: message },
     ];
+
+    // §J — Track si passer_commande crée une commande durant cette boucle.
+    let createdOrderId: string | undefined;
 
     for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
       const response = await this.anthropic.messages.create({
@@ -170,6 +173,18 @@ export class AssistantService {
         for (const block of response.content) {
           if (block.type === 'tool_use') {
             const result = await this.executeTool(block.name, block.input, buyerUserId);
+
+            // §J — Capturer l'ID de commande créée pour le renvoyer au frontend.
+            if (
+              block.name === 'passer_commande' &&
+              typeof result === 'object' &&
+              result !== null &&
+              'id' in result &&
+              typeof (result as Record<string, unknown>).id === 'string'
+            ) {
+              createdOrderId = (result as Record<string, string>).id;
+            }
+
             toolResults.push({
               type: 'tool_result',
               tool_use_id: block.id,
@@ -181,10 +196,16 @@ export class AssistantService {
         continue;
       }
 
-      return { reply: this.extractText(response) };
+      return {
+        reply: this.extractText(response),
+        ...(createdOrderId !== undefined ? { order_id: createdOrderId } : {}),
+      };
     }
 
-    return { reply: "Désolé, je n'ai pas pu traiter votre demande. Réessayez plus simplement." };
+    return {
+      reply: "Désolé, je n'ai pas pu traiter votre demande. Réessayez plus simplement.",
+      ...(createdOrderId !== undefined ? { order_id: createdOrderId } : {}),
+    };
   }
 
   /* ── Exécution des outils — SCOPÉE au buyer du JWT ─────── */

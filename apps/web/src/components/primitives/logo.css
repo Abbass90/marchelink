@@ -1,0 +1,42 @@
+/* ── Logo MarchéLink — lockup mark + wordmark, responsive ──── */
+
+.ml-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  line-height: 1;
+}
+
+.ml-logo-mark {
+  display: block;
+  width: var(--logo-mark-size, 2rem);
+  height: var(--logo-mark-size, 2rem);
+  flex-shrink: 0;
+}
+
+.ml-logo-word {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.ml-logo-word-accent {
+  color: var(--color-accent);
+}
+
+/* Ton clair : wordmark blanc sur fond foncé/primary (accent caramel conservé). */
+.ml-logo--light .ml-logo-word {
+  color: var(--color-primary-fg);
+}
+
+/* Tailles */
+.ml-logo--sm { --logo-mark-size: 1.5rem;  font-size: var(--text-md);  }
+.ml-logo--md { --logo-mark-size: 2rem;     font-size: var(--text-xl);  }
+.ml-logo--lg { --logo-mark-size: 2.75rem;  font-size: var(--text-2xl); }
+
+/* Responsive : réduit le wordmark sur très petits écrans */
+@media (max-width: 380px) {
+  .ml-logo--md { font-size: var(--text-lg); }
+  .ml-logo--lg { --logo-mark-size: 2.25rem; font-size: var(--text-xl); }
+}

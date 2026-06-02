@@ -23,6 +23,7 @@ import ProductManager from './pages/ProductManager.js';
 import BuyerOrders from './pages/BuyerOrders.js';
 import WholesalerOrders from './pages/WholesalerOrders.js';
 import WholesalerOrderDetail from './pages/WholesalerOrderDetail.js';
+import BuyerOrderDetail from './pages/BuyerOrderDetail.js';
 import BuyerPayments from './pages/BuyerPayments.js';
 import WholesalerPayments from './pages/WholesalerPayments.js';
 import BuyerChat from './pages/BuyerChat.js';
@@ -52,6 +53,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="/buyer/catalog" element={<BuyerCatalog />} />
                   <Route path="/buyer/products/:id" element={<ProductDetail />} />
                   <Route path="/buyer/orders" element={<BuyerOrders />} />
+                  <Route path="/buyer/orders/:id" element={<BuyerOrderDetail />} />
                   <Route path="/buyer/cart" element={<Cart />} />
                   <Route path="/buyer/order-confirmation/:id" element={<OrderConfirmation />} />
                   <Route path="/buyer/payments" element={<BuyerPayments />} />

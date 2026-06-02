@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { OrderService } from './order.service.js';
-import { PlaceOrderSchema, UpdateOrderStatusSchema } from './order.schema.js';
+import { PlaceOrderSchema, UpdateOrderStatusSchema, SetDeliveryModeSchema } from './order.schema.js';
 import { ValidationError } from '../../errors/index.js';
 
 export class OrderController {
@@ -47,6 +47,15 @@ export class OrderController {
     }
   };
 
+  getOrderDetailForBuyer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const order = await this.service.getDetailForBuyer(req.params.id!, req.user!.id);
+      res.json(order);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   getByIdForWholesaler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const order = await this.service.getByIdForWholesaler(req.params.id!, req.user!.organization_id!);
@@ -82,6 +91,24 @@ export class OrderController {
           order = await this.service.deliverOrder(orderId, orgId, actorId);
           break;
       }
+      res.json(order);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  setDeliveryMode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsed = SetDeliveryModeSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(422).json({ status: 422, error: 'VALIDATION_ERROR', message: parsed.error.issues });
+        return;
+      }
+      const order = await this.service.setDeliveryMode(
+        req.params.id!,
+        parsed.data.delivery_mode,
+        req.user!.organization_id!,
+      );
       res.json(order);
     } catch (err) {
       next(err);

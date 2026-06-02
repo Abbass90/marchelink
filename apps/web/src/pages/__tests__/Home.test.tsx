@@ -42,7 +42,7 @@ describe('Home — Premium Landing Page', () => {
     it('renders portal navigation buttons', () => {
       render(<Home />);
       const nav = screen.getByTestId('navbar');
-      expect(within(nav).getByRole('button', { name: /acheteur/i })).toBeInTheDocument();
+      expect(within(nav).getByRole('button', { name: /boutiquier/i })).toBeInTheDocument();
       expect(within(nav).getByRole('button', { name: 'Grossiste' })).toBeInTheDocument();
     });
 
@@ -153,7 +153,7 @@ describe('Home — Premium Landing Page', () => {
 
     it('renders stat labels', () => {
       render(<Home />);
-      expect(screen.getByText('Acheteurs actifs')).toBeInTheDocument();
+      expect(screen.getByText('Boutiquiers actifs')).toBeInTheDocument();
       expect(screen.getByText('Grossistes certifiés')).toBeInTheDocument();
       expect(screen.getByText('Transactions sécurisées')).toBeInTheDocument();
     });
@@ -263,12 +263,60 @@ describe('Home — Premium Landing Page', () => {
       expect(screen.getByTestId('footer')).toBeInTheDocument();
     });
 
-    it('renders location and year', () => {
+    it('renders location in contact block', () => {
       render(<Home />);
       const footer = screen.getByTestId('footer');
       expect(footer).toHaveTextContent(/Abidjan/);
       expect(footer).toHaveTextContent(/Côte d'Ivoire/);
+    });
+
+    it('renders current year in bottom bar', () => {
+      render(<Home />);
+      const footer = screen.getByTestId('footer');
       expect(footer).toHaveTextContent(new Date().getFullYear().toString());
+    });
+
+    it('renders brand name in bottom bar', () => {
+      render(<Home />);
+      const footer = screen.getByTestId('footer');
+      expect(footer).toHaveTextContent(/MarchéLink/);
+    });
+
+    it('renders all navigation links', () => {
+      render(<Home />);
+      const footer = screen.getByTestId('footer');
+      expect(within(footer).getByText('Accueil')).toBeInTheDocument();
+      expect(within(footer).getByText('Catalogue')).toBeInTheDocument();
+      expect(within(footer).getByText('Inscription')).toBeInTheDocument();
+      expect(within(footer).getByText('Connexion')).toBeInTheDocument();
+    });
+
+    it('renders contact email', () => {
+      render(<Home />);
+      expect(screen.getByTestId('footer-email')).toHaveTextContent('contact@marchelink.xyz');
+    });
+
+    it('renders both founders with LinkedIn buttons', () => {
+      render(<Home />);
+      const btns = screen.getAllByTestId('founder-linkedin');
+      expect(btns).toHaveLength(2);
+      expect(btns[0]).toHaveTextContent('Abbas Kanso');
+      expect(btns[1]).toHaveTextContent('Jaafar Seklawi');
+    });
+
+    it('LinkedIn buttons open in new tab with noopener', () => {
+      render(<Home />);
+      const btns = screen.getAllByTestId('founder-linkedin');
+      btns.forEach((btn) => {
+        expect(btn).toHaveAttribute('target', '_blank');
+        expect(btn).toHaveAttribute('rel', 'noopener noreferrer');
+      });
+    });
+
+    it('LinkedIn URLs are not visible as text', () => {
+      render(<Home />);
+      const footer = screen.getByTestId('footer');
+      expect(footer).not.toHaveTextContent('linkedin.com');
     });
   });
 

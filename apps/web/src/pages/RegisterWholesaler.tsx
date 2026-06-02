@@ -6,6 +6,15 @@ import { useAuth } from '../hooks/useAuth.js';
 import { ApiError } from '../api/client.js';
 import '../components/primitives/auth.css';
 
+/** Validation format numéro ivoirien — normalisation côté backend. */
+const ciPhoneSchema = z
+  .string()
+  .min(1, 'Le numéro est requis')
+  .refine((val) => {
+    const s = val.replace(/[\s\-\.\(\)]/g, '');
+    return /^(\+225|00225)?\d{10}$/.test(s);
+  }, 'Numéro ivoirien invalide — ex : 07 00 00 00 00 ou +225 07 00 00 00 00');
+
 const RegisterWholesalerFormSchema = z.object({
   organization_name: z.string().min(1, "Le nom de l'entreprise est requis").max(255),
   first_name: z.string().min(1, 'Le prénom est requis').max(100),
@@ -15,7 +24,7 @@ const RegisterWholesalerFormSchema = z.object({
     .string()
     .min(8, 'Minimum 8 caractères')
     .max(128),
-  phone: z.string().max(20).optional(),
+  phone: ciPhoneSchema,
 });
 
 type FormFields = z.infer<typeof RegisterWholesalerFormSchema>;
@@ -73,7 +82,6 @@ export default function RegisterWholesaler() {
   const handleBlur = useCallback(
     (e: FocusEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      if (name === 'phone' && value === '') return;
       validateField(name as keyof FormFields, value);
     },
     [validateField],
@@ -232,7 +240,7 @@ export default function RegisterWholesaler() {
 
           <div className="auth-field">
             <label className="auth-label" htmlFor="reg-phone">
-              Téléphone <span className="auth-label-opt">(optionnel)</span>
+              Téléphone
             </label>
             <input
               id="reg-phone"
@@ -266,7 +274,7 @@ export default function RegisterWholesaler() {
 
         <p className="auth-footer">
           Vous êtes boutiquier ?{' '}
-          <Link to="/register">Inscription acheteur</Link>
+          <Link to="/register">Inscription boutiquier</Link>
         </p>
         <p className="auth-footer">
           Déjà un compte ?{' '}

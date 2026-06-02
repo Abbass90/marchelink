@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchOrgOrder, fetchOrgOrderTimeline, updateOrderStatus, ApiError } from '../api/client.js';
+import { fetchOrgOrder, fetchOrgOrderTimeline, updateOrderStatus, setDeliveryMode, ApiError } from '../api/client.js';
 import type { OrderResponse } from '../api/client.js';
 import OrderTimeline from '../components/features/OrderTimeline.js';
+import { SWIFTGO_URL } from '../config/site.js';
 import '../components/primitives/catalog.css';
 
 function formatXOF(amount: string): string {
@@ -21,6 +22,8 @@ export default function WholesalerOrderDetail() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -43,6 +46,20 @@ export default function WholesalerOrderDetail() {
       setActionError(err instanceof ApiError ? err.message : 'Action impossible');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleDeliveryMode = async (mode: 'wholesaler' | 'swiftgo') => {
+    if (!id) return;
+    setDeliveryLoading(true);
+    setDeliveryError(null);
+    try {
+      const updated = await setDeliveryMode(id, mode);
+      setOrder(updated);
+    } catch (err) {
+      setDeliveryError(err instanceof ApiError ? err.message : 'Action impossible');
+    } finally {
+      setDeliveryLoading(false);
     }
   };
 
@@ -143,6 +160,56 @@ export default function WholesalerOrderDetail() {
               </div>
             )}
           </section>
+
+          {/* ── §5 Mode de livraison ───────────────────── */}
+          {order.delivery_mode === null &&
+            ['accepted', 'paid', 'shipped'].includes(order.status) && (
+            <div className="wo-delivery-block" data-testid="delivery-mode-selector">
+              <p className="st-label">Mode de livraison</p>
+              {deliveryError && (
+                <p className="st-error" data-testid="delivery-error">{deliveryError}</p>
+              )}
+              <div className="wo-card-actions wo-card-actions--detail">
+                <button
+                  className="wo-action-btn wo-action-btn--accept"
+                  data-testid="delivery-wholesaler-btn"
+                  disabled={deliveryLoading}
+                  onClick={() => void handleDeliveryMode('wholesaler')}
+                >
+                  {deliveryLoading ? '…' : 'Livraison propre'}
+                </button>
+                <button
+                  className="wo-action-btn wo-action-btn--swiftgo"
+                  data-testid="delivery-swiftgo-btn"
+                  disabled={deliveryLoading}
+                  onClick={() => void handleDeliveryMode('swiftgo')}
+                >
+                  {deliveryLoading ? '…' : 'SwiftGo'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {order.delivery_mode !== null && (
+            <div className="wo-delivery-block" data-testid="delivery-mode-display">
+              <p className="st-label">Mode de livraison</p>
+              {order.delivery_mode === 'swiftgo' ? (
+                <a
+                  href={SWIFTGO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="wo-action-btn wo-action-btn--swiftgo"
+                  data-testid="swiftgo-link"
+                >
+                  Commander via SwiftGo →
+                </a>
+              ) : (
+                <span className="wo-status" data-testid="delivery-mode-label">
+                  Livraison propre
+                </span>
+              )}
+            </div>
+          )}
 
           {id && <OrderTimeline orderId={id} fetchFn={fetchOrgOrderTimeline} />}
         </>

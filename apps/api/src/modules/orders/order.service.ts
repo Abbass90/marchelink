@@ -143,6 +143,17 @@ export class OrderService {
     return { ...order, items };
   }
 
+  /**
+   * §11 — Vue détail acheteur enrichie : inclut le nom du grossiste (org_name)
+   * et les noms/unités de produits dans les lignes de commande.
+   */
+  async getDetailForBuyer(orderId: string, buyerUserId: string) {
+    const order = await this.repo.findByIdForBuyerDetail(orderId, buyerUserId);
+    if (!order) throw new NotFoundError('Order not found');
+    const items = await this.repo.findItemsByOrderIdEnriched(orderId);
+    return { ...order, items };
+  }
+
   async acceptOrder(orderId: string, orgId: string, actorUserId?: string) {
     const order = await this.repo.findByIdForWholesaler(orderId, orgId);
     if (!order) throw new NotFoundError('Order not found');
@@ -221,6 +232,25 @@ export class OrderService {
       });
     }
     return updated;
+  }
+
+  /**
+   * §5 — Le grossiste choisit le mode de livraison après acceptation.
+   * La commande doit être dans un état post-acceptation (accepted, paid, shipped).
+   */
+  async setDeliveryMode(orderId: string, mode: string, orgId: string) {
+    const order = await this.repo.findByIdForWholesaler(orderId, orgId);
+    if (!order) throw new NotFoundError('Order not found');
+    const allowedStatuses = ['accepted', 'paid', 'shipped'];
+    if (!allowedStatuses.includes(order.status)) {
+      throw new ValidationError(
+        `Le mode de livraison ne peut être défini que sur une commande acceptée, payée ou expédiée (statut actuel : '${order.status}')`,
+      );
+    }
+    const updated = await this.repo.setDeliveryMode(orderId, mode, orgId);
+    if (!updated) throw new NotFoundError('Order not found');
+    const items = await this.repo.findItemsByOrderId(orderId);
+    return { ...updated, items };
   }
 
   async cancelOrder(orderId: string, buyerUserId: string) {

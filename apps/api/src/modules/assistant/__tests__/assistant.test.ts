@@ -51,16 +51,16 @@ beforeEach(async () => {
 
   await db('users').insert({
     email: 'admin@test.com', password_hash: hash, role: 'wholesaler_admin',
-    organization_id: orgId, first_name: 'Admin', last_name: 'A',
+    organization_id: orgId, first_name: 'Admin', last_name: 'A', phone: '+2250701010101',
   });
   const [buyerA] = await db('users').insert({
     email: 'buyer-a@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Buyer', last_name: 'A',
+    organization_id: null, first_name: 'Buyer', last_name: 'A', phone: '+2250701010102',
   }).returning('id');
   buyerAId = buyerA!.id;
   const [buyerB] = await db('users').insert({
     email: 'buyer-b@test.com', password_hash: hash, role: 'buyer',
-    organization_id: null, first_name: 'Buyer', last_name: 'B',
+    organization_id: null, first_name: 'Buyer', last_name: 'B', phone: '+2250701010103',
   }).returning('id');
 
   // Commande appartenant à l'acheteur B (montant distinctif pour détecter une fuite).
@@ -279,5 +279,66 @@ describe('Assistant IA — sécurité prompt-injection', () => {
     expect(res.status).toBe(200);
     expect(res.body.reply).toMatch(/assistant MarchéLink/i);
     expect(assistantMockCreate).not.toHaveBeenCalled();
+  });
+});
+
+/* ── §J — Round-trip order_id ────────────────────────────── */
+
+describe('Assistant IA — §J round-trip order_id', () => {
+  async function insertProduct(overrides: Record<string, unknown> = {}): Promise<string> {
+    const db = getTestDb();
+    const [p] = await db('products')
+      .insert({
+        organization_id: orgId,
+        sku: 'RIZ-25-J',
+        name: 'Riz parfumé 25kg',
+        price_xof: 15000,
+        stock_qty: 100,
+        unit: 'sac',
+        category: 'alimentaire',
+        created_by: buyerAId,
+        updated_by: buyerAId,
+        ...overrides,
+      })
+      .returning('id');
+    return p!.id as string;
+  }
+
+  it('passer_commande retourne order_id dans la réponse JSON', async () => {
+    const productId = await insertProduct();
+    assistantMockCreate.mockResolvedValueOnce(
+      toolUseResponse('passer_commande', { grossiste_id: orgId, items: [{ product_id: productId, quantity: 1 }] }),
+    );
+    assistantMockCreate.mockResolvedValueOnce(textResponse('Commande enregistrée.'));
+
+    const res = await request(app)
+      .post('/api/assistant/chat')
+      .set('Cookie', buyerACookie)
+      .send({ message: 'Oui je valide' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.reply).toBeTruthy();
+    // §J — order_id doit être présent et correspondre à la commande créée
+    expect(typeof res.body.order_id).toBe('string');
+    const order = await getTestDb()('orders').where({ id: res.body.order_id }).first();
+    expect(order).toBeDefined();
+    expect(order!.buyer_user_id).toBe(buyerAId);
+  });
+
+  it('preparer_commande ne retourne PAS order_id', async () => {
+    const productId = await insertProduct();
+    assistantMockCreate.mockResolvedValueOnce(
+      toolUseResponse('preparer_commande', { grossiste_id: orgId, items: [{ product_id: productId, quantity: 1 }] }),
+    );
+    assistantMockCreate.mockResolvedValueOnce(textResponse('Voici le récap. Je valide ?'));
+
+    const res = await request(app)
+      .post('/api/assistant/chat')
+      .set('Cookie', buyerACookie)
+      .send({ message: 'Je veux 1 sac de riz' });
+
+    expect(res.status).toBe(200);
+    // preparer_commande ne crée rien → order_id absent
+    expect(res.body.order_id).toBeUndefined();
   });
 });

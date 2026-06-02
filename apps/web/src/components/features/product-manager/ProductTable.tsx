@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { X } from 'lucide-react';
 import type { Product } from '../../../api/client.js';
 import { formatXOF } from './product-form.helpers.js';
 
@@ -81,7 +82,7 @@ export default function ProductTable({ products, onEdit, onDelete }: ProductTabl
                       data-testid="pm-delete-cancel"
                       onClick={() => setDeleteConfirm(null)}
                     >
-                      ✕
+                      <X size={14} />
                     </button>
                   </span>
                 ) : (
