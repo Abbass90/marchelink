@@ -90,6 +90,11 @@ export function authMe(): Promise<UserProfile> {
   return apiFetch<UserProfile>('/auth/me');
 }
 
+/** Confirme l'adresse email via le token reçu par email. */
+export function authVerifyEmail(token: string): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`);
+}
+
 /* ── Profile & Password ──────────────────────────────── */
 
 export interface UpdateProfilePayload {

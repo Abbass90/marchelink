@@ -45,7 +45,22 @@ export class AuthService {
   async register(input: RegisterBuyerInput): Promise<{ userId: string }> {
     const existing = await this.repo.findByEmail(input.email);
     if (existing) {
-      throw new ValidationError('Email already registered');
+      // Compte déjà vérifié → vraie collision : on refuse l'inscription.
+      if (existing.email_verified_at) {
+        throw new ValidationError('Email already registered');
+      }
+      // Compte existant mais email jamais vérifié (ex. le 1er mail n'est pas arrivé).
+      // On rafraîchit le compte et on renvoie un nouvel email de vérification —
+      // sans recréer le compte. Sûr car la propriété de l'email n'est pas prouvée.
+      const refreshedHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
+      await this.repo.updateUser(existing.id, {
+        password_hash: refreshedHash,
+        first_name: input.first_name,
+        last_name: input.last_name,
+        ...(input.phone !== undefined ? { phone: input.phone } : {}),
+      });
+      await this.sendEmailVerification(existing.id, existing.email, input.first_name);
+      return { userId: existing.id };
     }
 
     const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
@@ -108,6 +123,18 @@ export class AuthService {
 
     const existing = await this.repo.findByEmail(input.email);
     if (existing) {
+      // Compte grossiste non vérifié → renvoyer un nouvel email (org déjà créée).
+      if (!existing.email_verified_at && existing.organization_id) {
+        const refreshedHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
+        await this.repo.updateUser(existing.id, {
+          password_hash: refreshedHash,
+          first_name: input.first_name,
+          last_name: input.last_name,
+          ...(input.phone !== undefined ? { phone: input.phone } : {}),
+        });
+        await this.sendEmailVerification(existing.id, existing.email, input.first_name);
+        return { userId: existing.id, organizationId: existing.organization_id };
+      }
       throw new ValidationError('Email already registered');
     }
 

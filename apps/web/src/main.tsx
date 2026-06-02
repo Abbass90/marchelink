@@ -12,6 +12,7 @@ import Home from './pages/Home.js';
 import Login from './pages/Login.js';
 import Register from './pages/Register.js';
 import RegisterWholesaler from './pages/RegisterWholesaler.js';
+import VerifyEmail from './pages/VerifyEmail.js';
 import BuyerDashboard from './pages/BuyerDashboard.js';
 import BuyerCatalog from './pages/BuyerCatalog.js';
 import ProductDetail from './pages/ProductDetail.js';
@@ -45,6 +46,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/register-wholesaler" element={<RegisterWholesaler />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
 
               {/* ── Buyer routes (sidebar layout) ────────── */}
               <Route element={<ProtectedRoute allowedRoles={['buyer']} />}>

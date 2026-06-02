@@ -170,7 +170,7 @@ describe('AuthProvider — login', () => {
 });
 
 describe('AuthProvider — register', () => {
-  it('calls authRegister, then auto-login, then authMe', async () => {
+  it('calls authRegister and stays unauthenticated (email verification required)', async () => {
     const { ApiError } = await import('../../api/client.js');
     // Boot: no session
     mockAuthMe.mockRejectedValueOnce(new ApiError(401, 'UNAUTHORIZED', 'No token'));
@@ -182,20 +182,20 @@ describe('AuthProvider — register', () => {
       expect(screen.getByTestId('loading').textContent).toBe('false');
     });
 
-    // Register
+    // Register — no auto-login (email verification required)
     mockAuthRegister.mockResolvedValueOnce({ id: 'uuid-new' });
-    mockAuthLogin.mockResolvedValueOnce({ message: 'Logged in' });
-    mockAuthMe.mockResolvedValueOnce(fakeUser);
 
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     await user.click(screen.getByText('Register'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('true');
+      expect(screen.getByTestId('loading').textContent).toBe('false');
     });
 
+    // User must verify email before logging in — still unauthenticated
+    expect(screen.getByTestId('authenticated').textContent).toBe('false');
     expect(mockAuthRegister).toHaveBeenCalledTimes(1);
-    expect(mockAuthLogin).toHaveBeenCalledTimes(1);
+    expect(mockAuthLogin).not.toHaveBeenCalled();
   });
 });
 

@@ -57,6 +57,7 @@ export default function RegisterWholesaler() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [apiError, setApiError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   if (isAuthenticated && user) {
     navigate(dashboardPath(user.role), { replace: true });
@@ -106,6 +107,8 @@ export default function RegisterWholesaler() {
       setSubmitting(true);
       try {
         await registerWholesaler(parsed.data);
+        // Registration succeeded — user must verify email before logging in.
+        setEmailSent(true);
       } catch (err) {
         const message =
           err instanceof ApiError ? err.message : 'Une erreur est survenue. Réessayez.';
@@ -116,6 +119,33 @@ export default function RegisterWholesaler() {
     },
     [fields, registerWholesaler],
   );
+
+  /* ── Succès : email de vérification envoyé ─────────────── */
+  if (emailSent) {
+    return (
+      <div className="auth-page" data-testid="register-wholesaler-page">
+        <div className="auth-card">
+          <div className="auth-header">
+            <Link to="/" className="auth-brand">
+              <span className="auth-brand-dot" />
+              MarchéLink
+            </Link>
+            <h1 className="auth-title">Vérifiez votre email</h1>
+            <p className="auth-subtitle">Votre compte grossiste a été créé avec succès !</p>
+          </div>
+          <p className="auth-subtitle">
+            Un email de confirmation a été envoyé à <strong>{fields.email}</strong>.
+            Cliquez sur le lien pour activer votre compte, puis connectez-vous.
+          </p>
+          <div className="auth-form-actions">
+            <Link to="/login" className="auth-submit">
+              Se connecter
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-page" data-testid="register-wholesaler-page">

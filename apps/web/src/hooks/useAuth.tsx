@@ -155,18 +155,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
         await authRegister(payload);
-        // Auto-login after registration
-        await authLogin({ email: payload.email, password: payload.password });
-        const user = await authMe();
-        setState({ user, loading: false, error: null });
-        startRefreshLoop();
+        // Email verification required — cannot auto-login.
+        // The caller (Register.tsx) shows a "check your email" success state.
+        setState((s) => ({ ...s, loading: false }));
       } catch (err) {
         const message = err instanceof ApiError ? err.message : "Erreur lors de l'inscription";
         setState((s) => ({ ...s, loading: false, error: message }));
         throw err;
       }
     },
-    [startRefreshLoop],
+    [],
   );
 
   const registerWholesaler = useCallback(
@@ -174,17 +172,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
         await authRegisterWholesaler(payload);
-        await authLogin({ email: payload.email, password: payload.password });
-        const user = await authMe();
-        setState({ user, loading: false, error: null });
-        startRefreshLoop();
+        // Email verification required — cannot auto-login.
+        setState((s) => ({ ...s, loading: false }));
       } catch (err) {
         const message = err instanceof ApiError ? err.message : "Erreur lors de l'inscription";
         setState((s) => ({ ...s, loading: false, error: message }));
         throw err;
       }
     },
-    [startRefreshLoop],
+    [],
   );
 
   const logout = useCallback(async () => {

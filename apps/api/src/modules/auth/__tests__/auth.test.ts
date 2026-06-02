@@ -55,12 +55,28 @@ describe('UC-08: Buyer registration and login', () => {
       );
     });
 
-    it('rejects duplicate email', async () => {
+    it('rejects duplicate email when the account is already verified', async () => {
       await request(app).post('/api/auth/register').send(validBuyer);
+      // Un compte vérifié = vraie collision.
+      await getTestDb()('users').where({ email: validBuyer.email }).update({ email_verified_at: new Date() });
       const res = await request(app).post('/api/auth/register').send(validBuyer);
 
       expect(res.status).toBe(422);
       expect(res.body.error).toBe('VALIDATION_ERROR');
+    });
+
+    it('re-registering an unverified email resends verification (201, no duplicate)', async () => {
+      const first = await request(app).post('/api/auth/register').send(validBuyer);
+      expect(first.status).toBe(201);
+
+      // Email jamais vérifié → la ré-inscription renvoie un email, ne bloque pas.
+      const second = await request(app).post('/api/auth/register').send(validBuyer);
+      expect(second.status).toBe(201);
+      expect(second.body.id).toBe(first.body.id); // même compte, pas de doublon
+
+      // Un seul utilisateur en base pour cet email.
+      const rows = await getTestDb()('users').where({ email: validBuyer.email });
+      expect(rows).toHaveLength(1);
     });
 
     it('rejects invalid payload (missing fields)', async () => {
@@ -310,10 +326,12 @@ describe('F1: Wholesaler registration', () => {
       expect(meRes.body.first_name).toBe(validWholesaler.first_name);
     });
 
-    it('rejects duplicate email', async () => {
+    it('rejects duplicate email when the account is already verified', async () => {
       await request(app)
         .post('/api/auth/register-wholesaler')
         .send(validWholesaler);
+      // Un compte vérifié = vraie collision.
+      await getTestDb()('users').where({ email: validWholesaler.email }).update({ email_verified_at: new Date() });
 
       const res = await request(app)
         .post('/api/auth/register-wholesaler')
