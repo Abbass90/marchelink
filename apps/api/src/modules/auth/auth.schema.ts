@@ -10,7 +10,7 @@ import { z } from 'zod';
    ─────────────────────────────────────────────────── */
 
 function normalizeIvorianPhone(raw: string): string | null {
-  const stripped = raw.replace(/[\s\-\.\(\)]/g, '');
+  const stripped = raw.replace(/[\s\-.()]/g, '');
   let digits: string;
 
   if (stripped.startsWith('+225')) {
